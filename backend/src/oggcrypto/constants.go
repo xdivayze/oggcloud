@@ -8,8 +8,7 @@ import (
 
 const AES_KEY_SIZE = 32
 const SALT_LENGTH = 16
-const NONCE_SIZE = 12
-
+const NONCE_LENGTH = 12
 
 var cwdir string
 var data_folder string

@@ -2,11 +2,38 @@ package oggcrypto_test
 
 import (
 	"encoding/hex"
+	"fmt"
 	"log"
 	"oggcloudserver/src/oggcrypto"
 	"os"
 	"testing"
 )
+
+func TestAESEncryption(t *testing.T) {
+	plaintext := []byte("bedava fare peynir kapanında olur.")
+	key, err := oggcrypto.GenerateAESKey()
+	if err != nil {
+		log.Fatalf("error generating aes key:\n\t%v", err)
+	}
+	cipher, err := oggcrypto.EncryptAES(plaintext, key)
+	if err != nil {
+		log.Fatalf("error encrypting:\n\t%v", err)
+	}
+
+	decipheredtext, err := oggcrypto.DecryptAES(cipher, key)
+	{
+		decipheredtext := string(decipheredtext)
+		plaintext := string(plaintext)
+		if err != nil {
+			log.Fatalf("decryption failed:\n\t%v", err)
+		}
+		if decipheredtext != plaintext {
+			log.Fatalf("plaintext doesn't match decipheredtext:\n\t%s == %s", plaintext, decipheredtext)
+		}
+	}
+	fmt.Fprintf(os.Stdout, "%x\nis equal to\n%x\n",plaintext,decipheredtext)
+
+}
 
 func TestECDHFunctions(t *testing.T) {
 	defer os.Remove(oggcrypto.MASTERKEY_PATH)

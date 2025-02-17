@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	key, err := generateAESKey()
+	key, err := GenerateAESKey()
 	if err != nil {
 		log.Fatalf("error generating aes keys:\n\t%v", err)
 	}
@@ -28,7 +28,32 @@ func init() {
 	}
 }
 
-func generateAESKey() ([]byte, error) {
+func DecryptAES(ciphertext []byte, key []byte) ([]byte, error) {
+	if len(ciphertext) < 12 {
+		return nil, fmt.Errorf("ciphertext too short to contain a nonce")
+	}
+	nonce := ciphertext[:NONCE_LENGTH]
+	encData := ciphertext[NONCE_LENGTH:]
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, fmt.Errorf("could not create AES cipher: \n\t%v", err)
+	}
+
+	aesGCM, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, fmt.Errorf("could not create GCM mode: \n\t%v", err)
+	}
+
+	plainText, err := aesGCM.Open(nil, nonce, encData, nil)
+	if err != nil {
+		return nil, fmt.Errorf("decryption failed:\n\t%v", err)
+	}
+	return plainText, nil
+
+}
+
+func GenerateAESKey() ([]byte, error) {
 	key := make([]byte, AES_KEY_SIZE)
 	_, err := io.ReadFull(rand.Reader, key)
 	if err != nil {
@@ -42,7 +67,7 @@ func EncryptAES(data []byte, key []byte) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not create aes cipher:\n\t %w", err)
 	}
-	nonce := make([]byte, NONCE_SIZE)
+	nonce := make([]byte, NONCE_LENGTH)
 	if _, err := rand.Read(nonce); err != nil {
 		return nil, fmt.Errorf("could not generate nonce:\n\t%w", err)
 	}
