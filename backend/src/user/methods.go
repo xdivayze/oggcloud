@@ -34,7 +34,7 @@ func GetUserFromID(id uuid.UUID) (*User, error) {
 
 }
 
-func generateAndEncryptSharedKey(clientpub string) (string, string, error) {
+func GenerateAndEncryptSharedKey(clientpub string) (string, string, error) {
 
 	pubkey, err := oggcrypto.ReadFromPEM(clientpub)
 	if err != nil {

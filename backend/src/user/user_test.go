@@ -94,7 +94,7 @@ func TestRegisterUser(t *testing.T) {
 	}
 
 	var jsonData map[string]interface{}
-	if err := json.Unmarshal(w.Body.Bytes(), &jsonData); err != nil{
+	if err := json.Unmarshal(w.Body.Bytes(), &jsonData); err != nil {
 		t.Logf("error marshaling json:\n\t%v\n", err)
 	}
 

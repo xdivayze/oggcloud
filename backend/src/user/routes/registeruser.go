@@ -1,4 +1,4 @@
-package user
+package routes
 
 import (
 	"encoding/hex"
@@ -7,13 +7,16 @@ import (
 	"net/http"
 	"oggcloudserver/src/db"
 	"oggcloudserver/src/functions"
+	"oggcloudserver/src/user"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func GetUser() {}
+//TODO password length check
+//TODO email check
+//TODO add more compertmantalization to tidy up the code maybe a controller directory and another subdirectory for each route
 
 func RegisterUser(c *gin.Context) {
 	log.SetPrefix("ERROR: ")
@@ -53,14 +56,14 @@ func RegisterUser(c *gin.Context) {
 	if s != 0 {
 		return
 	}
-	sharedkey, serverpub, err := generateAndEncryptSharedKey(ecdhclientpub) //salt is prepended to sharedkey
+	sharedkey, serverpub, err := user.GenerateAndEncryptSharedKey(ecdhclientpub) //salt is prepended to sharedkey
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error occured registering user"})
 		log.Printf("error occured while generating and encrypting the shared key:\n\t%v\n", err)
 		return
 	}
 	id := uuid.New()
-	user := User{
+	user := user.User{
 		ID:            id,
 		Email:         mail,
 		PasswordHash:  &password,
