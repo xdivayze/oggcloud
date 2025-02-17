@@ -2,10 +2,11 @@ package oggcrypto
 
 import (
 	"crypto/ecdh"
+	"crypto/ecdsa"
 	"crypto/rand"
 	"crypto/sha256"
 	"crypto/x509"
-	"encoding/base64"
+	"encoding/hex"
 	"encoding/pem"
 	"fmt"
 
@@ -40,7 +41,6 @@ func DeriveSharedSecret(privateKey *ecdh.PrivateKey, publicKey *ecdh.PublicKey, 
 			return nil, nil, fmt.Errorf("given salt cannot be casted to type []byte")
 		}
 	}
-	
 
 	hkdf := hkdf.New(sha256.New, shared, salt, nil)
 	derivedKey := make([]byte, AES_KEY_SIZE)
@@ -51,8 +51,8 @@ func DeriveSharedSecret(privateKey *ecdh.PrivateKey, publicKey *ecdh.PublicKey, 
 	return derivedKey, salt, nil
 }
 
-func ReadFromPEM(pemBlock string)(*ecdh.PublicKey, error){
-	pemEncoded, err := base64.StdEncoding.DecodeString(pemBlock)
+func ReadFromPEM(pemBlock string) (*ecdh.PublicKey, error) {
+	pemEncoded, err := hex.DecodeString(pemBlock)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding base64 encoded pem:\n\t%w", err)
 	}
@@ -61,11 +61,15 @@ func ReadFromPEM(pemBlock string)(*ecdh.PublicKey, error){
 	if err != nil {
 		return nil, fmt.Errorf("error parsing public key:\n\t%w", err)
 	}
-	pubKeyConverted, ok := pubKey.(*ecdh.PublicKey)
+	pubKeyConverted, ok := pubKey.(*ecdsa.PublicKey)
 	if !ok {
 		return nil, fmt.Errorf("type casting failed")
 	}
-	return pubKeyConverted, nil
+	pubkeyNIST, err := pubKeyConverted.ECDH()
+	if err != nil {
+		return nil, fmt.Errorf("error converting from ecdsa to ecdh:\n\t%w", err)
+	}
+	return pubkeyNIST, nil
 }
 
 func EncodePublicKeyToPEM(publicKey *ecdh.PublicKey) (string, error) {
@@ -79,6 +83,6 @@ func EncodePublicKeyToPEM(publicKey *ecdh.PublicKey) (string, error) {
 	}
 
 	pemEncoded := pem.EncodeToMemory(block)
-	base64Encoded := base64.StdEncoding.EncodeToString(pemEncoded)
-	return base64Encoded, nil
+	hexEncoded := hex.EncodeToString(pemEncoded)
+	return hexEncoded, nil
 }

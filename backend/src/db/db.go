@@ -2,7 +2,6 @@ package db
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -11,14 +10,16 @@ import (
 
 var DB *gorm.DB
 
-func Create_DB() {
+func Create_DB() error {
 	dsn := os.Getenv("POSTGRES_URI")
 	fmt.Println(dsn)
 	var err error
 	DB, err = setupDatabase(dsn)
 	if err != nil {
-		log.Fatal("%w", err)
+		return fmt.Errorf("error while creating db:\n\t%w", err)
 	}
+
+	return nil
 }
 
 func setupDatabase(dsn string) (*gorm.DB, error) {

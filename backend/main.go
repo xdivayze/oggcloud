@@ -2,17 +2,20 @@ package main
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"log"
 	"oggcloudserver/src"
 	"oggcloudserver/src/oggcrypto"
 	"os"
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
+
+func LoadDotenv() error {
+	return godotenv.Load()
+}
 
 func main() {
 	defer os.Remove(oggcrypto.MASTERKEY_PATH)
-	err := godotenv.Load()
+	err := LoadDotenv()
 	if err != nil {
 		log.Fatal("Error loading .env file %w", err)
 	}
@@ -20,11 +23,13 @@ func main() {
 	pguri := os.Getenv("POSTGRES_URI")
 	fmt.Println(pguri)
 
-	r := gin.Default()
+	r := src.SetupRouter()
 
-	dbl, _ := src.GetDB()
+	dbl, err := src.GetDB()
+	if err != nil {
+		log.Fatalf("error occured while getting the database:\n\t%v", err)
+	}
+
 	fmt.Print("%w", dbl)
-	
-
 	r.Run(":5000")
 }

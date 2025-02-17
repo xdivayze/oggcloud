@@ -3,3 +3,4 @@ backend/.env
 Storage/**/*
 backend/src/oggcrypto/data/**/*.pem
 backend/src/oggcrypto/data/**/*.hex
+.vscode
