@@ -1,23 +1,18 @@
 package registeruser
 
 import (
-	"encoding/hex"
 	"fmt"
 	"log"
 	"net/http"
 	"oggcloudserver/src/db"
-	"oggcloudserver/src/functions"
 	"oggcloudserver/src/user/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
-//TODO password length check
 //TODO email check
-//TODO add more compertmantalization to tidy up the code maybe a controller directory and another subdirectory for each route
-
+//TODO implement invitation code
 func RegisterUser(c *gin.Context) {
 	log.SetPrefix("ERROR: ")
 	var jsonData map[string]interface{}
@@ -27,35 +22,27 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	mail, s := functions.FieldAssignment(c, "email", jsonData)
+	var mail string
+	var passwordhex string
+	var ecdhclientpub string
+
+	fieldmap := make(map[string]interface{})
+	fieldmap["email"] = &mail
+	fieldmap["password"] = &passwordhex
+	fieldmap["ecdh_public"] = &ecdhclientpub
+
+	s := doFieldAssign(c, jsonData, fieldmap)
 	if s != 0 {
+		log.Printf("error doing field assignments, returned:%d", s)
 		return
 	}
 
-	passwordhex, s := functions.FieldAssignment(c, "password", jsonData)
-	if s != 0 {
-		return
-	}
-
-	hexpass, err := hex.DecodeString(passwordhex)
+	password, err := processPassword(c, passwordhex)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "error occured registering user"})
-		log.Printf("error occured while generating bytes from hex:\n\t%v\n", err)
+		log.Printf("error occured while processing password: \n\t%v\n", err)
 		return
 	}
 
-	bcryptPass, err := bcrypt.GenerateFromPassword(hexpass, bcrypt.DefaultCost)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "error occured registering user"})
-		log.Printf("error occured while generating bcrypt:\n\t%v\n", err)
-		return
-	}
-	password := string(bcryptPass)
-
-	ecdhclientpub, s := functions.FieldAssignment(c, "ecdh_public", jsonData)
-	if s != 0 {
-		return
-	}
 	sharedkey, serverpub, err := model.GenerateAndEncryptSharedKey(ecdhclientpub) //salt is prepended to sharedkey
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error occured registering user"})

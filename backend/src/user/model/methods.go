@@ -31,7 +31,6 @@ func GetUserFromID(id uuid.UUID) (*User, error) {
 		return nil, fmt.Errorf("error occured when querying the database:\n\t%w", res.Error)
 	}
 	return &user, nil
-
 }
 
 func GenerateAndEncryptSharedKey(clientpub string) (string, string, error) {

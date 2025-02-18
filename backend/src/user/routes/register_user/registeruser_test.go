@@ -2,69 +2,33 @@ package registeruser_test
 
 import (
 	"bytes"
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"oggcloudserver/src"
 	"oggcloudserver/src/db"
-	"oggcloudserver/src/oggcrypto"
 	"oggcloudserver/src/user/model"
 	"testing"
-
+	"oggcloudserver/src/user/testing_material"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/joho/godotenv"
 )
+//TODO tidy up tests and check for
+//password exceeds length
+//faulty e mail
+
+
 
 func TestRegisterUser(t *testing.T) {
-
-	const examplemail string = "example@example.org"
-
-	dotenv_path := "/root/oggcloudserver/backend/.env"
-
-	err := godotenv.Load(dotenv_path)
-	if err != nil {
-		t.Fatalf("Error loading .env file %v\n", err)
-	}
-
-	_, error := src.GetDB()
-	if error != nil {
-		t.Fatalf("error creating database:\n\t%v\n", err)
-	}
-
+	testing_material.LoadDotEnv(t)
+	testing_material.LoadDB(t)
 	defer db.DB.Where("1 = 1").Delete(&model.User{})
 
 	gin.SetMode(gin.TestMode)
 	r := src.SetupRouter()
 	w := httptest.NewRecorder()
 
-	randomBytes := make([]byte, 60)
-	_, err = rand.Read(randomBytes)
-	if err != nil {
-		t.Fatalf("error reading from random buffer:\n\t%v\n", err)
-	}
-	randomString := hex.EncodeToString(randomBytes)
-
-	_, tp, err := oggcrypto.GenerateECDHPair()
-	if err != nil {
-		t.Fatalf("error generating ecdh pair:\n\t:%v\n", err)
-	}
-	pemBlock, err := oggcrypto.EncodePublicKeyToPEM(tp)
-	if err != nil {
-		t.Fatalf("error encoding public key:\n\t:%v\n", err)
-	}
-
-	data, err := json.Marshal(map[string]interface{}{
-		"email":       examplemail,
-		"password":    randomString,
-		"ecdh_public": pemBlock,
-	})
-
-	if err != nil {
-		t.Fatalf("error serializing to json:\n\t%v\n", err)
-	}
+	data := testing_material.GenerateUserJson(t)
 
 	endpoint := "/api/user/register"
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(data))
@@ -78,14 +42,14 @@ func TestRegisterUser(t *testing.T) {
 		t.Fatalf("expected 201, got %d\n\tjsonBody:%s", w.Code, w.Body.String())
 	}
 	t.Logf("responseBody:\n\t%s\n", w.Body.String())
-	_, res := model.GetUserFromMail(examplemail)
+	_, res := model.GetUserFromMail(testing_material.EXAMPLE_MAIL)
 	if res != nil {
 		t.Fatalf("error occured while getting user from database:\n\t%v\n", res.Error())
 	}
 
 	var jsonData map[string]interface{}
 	if err := json.Unmarshal(w.Body.Bytes(), &jsonData); err != nil {
-		t.Logf("error marshaling json:\n\t%v\n", err)
+		t.Logf("error unmarshaling json:\n\t%v\n", err)
 	}
 
 	id, exists := jsonData["id"]
@@ -97,6 +61,10 @@ func TestRegisterUser(t *testing.T) {
 		t.Logf("couldn't parse uuid:\n\t%v\n", err)
 	}
 	_, res = model.GetUserFromID(uuuid)
+	if res != nil {
+		t.Fatalf("error occured while getting user from database by ID:\n\t%v\n", res.Error())
+	}
+	_, res = model.GetUserFromMail(testing_material.EXAMPLE_MAIL)
 	if res != nil {
 		t.Fatalf("error occured while getting user from database:\n\t%v\n", res.Error())
 	}
