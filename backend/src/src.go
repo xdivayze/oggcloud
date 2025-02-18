@@ -3,6 +3,7 @@ package src
 import (
 	"oggcloudserver/src/db"
 	"oggcloudserver/src/file_ops/file"
+	"oggcloudserver/src/file_ops/session"
 	services "oggcloudserver/src/file_ops/session/Services"
 	"oggcloudserver/src/user/auth"
 	"oggcloudserver/src/user/model"
@@ -19,6 +20,10 @@ func SetupRouter() *gin.Engine {
 	{
 		userRoutes.POST("/register", registeruser.RegisterUser)
 		userRoutes.POST("/login", loginuser.LoginUser)
+	}
+	fileRoutes := r.Group("/api/file")
+	{
+		fileRoutes.POST("/upload", session.HandleFileUpload)
 	}
 	return r
 }

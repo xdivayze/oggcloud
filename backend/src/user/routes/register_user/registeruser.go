@@ -64,7 +64,7 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{
-		"id":                  id,
+		"id":                  id.String(),
 		"ServerECDHPublicKey": serverpub,
 	})
 	log.SetPrefix("INFO: ")

@@ -21,4 +21,5 @@ func HandleFileUpload(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error occured while processing files"})
 		return
 	}
+	c.JSON(http.StatusCreated, gin.H{"sessionID" : sess.ID.String()})
 }
