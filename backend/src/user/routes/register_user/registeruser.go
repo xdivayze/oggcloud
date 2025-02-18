@@ -1,4 +1,4 @@
-package routes
+package registeruser
 
 import (
 	"encoding/hex"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"oggcloudserver/src/db"
 	"oggcloudserver/src/functions"
-	"oggcloudserver/src/user"
+	"oggcloudserver/src/user/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -56,14 +56,14 @@ func RegisterUser(c *gin.Context) {
 	if s != 0 {
 		return
 	}
-	sharedkey, serverpub, err := user.GenerateAndEncryptSharedKey(ecdhclientpub) //salt is prepended to sharedkey
+	sharedkey, serverpub, err := model.GenerateAndEncryptSharedKey(ecdhclientpub) //salt is prepended to sharedkey
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error occured registering user"})
 		log.Printf("error occured while generating and encrypting the shared key:\n\t%v\n", err)
 		return
 	}
 	id := uuid.New()
-	user := user.User{
+	user := model.User{
 		ID:            id,
 		Email:         mail,
 		PasswordHash:  &password,

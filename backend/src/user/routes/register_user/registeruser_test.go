@@ -1,4 +1,4 @@
-package user_test
+package registeruser_test
 
 import (
 	"bytes"
@@ -10,9 +10,7 @@ import (
 	"oggcloudserver/src"
 	"oggcloudserver/src/db"
 	"oggcloudserver/src/oggcrypto"
-	"oggcloudserver/src/user"
-	"path/filepath"
-	"runtime"
+	"oggcloudserver/src/user/model"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -24,17 +22,9 @@ func TestRegisterUser(t *testing.T) {
 
 	const examplemail string = "example@example.org"
 
-	_, filename, _, _ := runtime.Caller(0)
-	absfilepath, err := filepath.Abs(filename)
-	if err != nil {
-		t.Fatalf("error initializing package, couldn't get absolute file path:%v", err)
-	}
+	dotenv_path := "/root/oggcloudserver/backend/.env"
 
-	cwdir := filepath.Dir(absfilepath)
-
-	dotenv_path := filepath.Join(cwdir, "../../.env")
-
-	godotenv.Load(dotenv_path)
+	err := godotenv.Load(dotenv_path)
 	if err != nil {
 		t.Fatalf("Error loading .env file %v\n", err)
 	}
@@ -44,7 +34,7 @@ func TestRegisterUser(t *testing.T) {
 		t.Fatalf("error creating database:\n\t%v\n", err)
 	}
 
-	defer db.DB.Where("1 = 1").Delete(&user.User{})
+	defer db.DB.Where("1 = 1").Delete(&model.User{})
 
 	gin.SetMode(gin.TestMode)
 	r := src.SetupRouter()
@@ -88,7 +78,7 @@ func TestRegisterUser(t *testing.T) {
 		t.Fatalf("expected 201, got %d\n\tjsonBody:%s", w.Code, w.Body.String())
 	}
 	t.Logf("responseBody:\n\t%s\n", w.Body.String())
-	_, res := user.GetUserFromMail(examplemail)
+	_, res := model.GetUserFromMail(examplemail)
 	if res != nil {
 		t.Fatalf("error occured while getting user from database:\n\t%v\n", res.Error())
 	}
@@ -106,7 +96,7 @@ func TestRegisterUser(t *testing.T) {
 	if err != nil {
 		t.Logf("couldn't parse uuid:\n\t%v\n", err)
 	}
-	_, res = user.GetUserFromID(uuuid)
+	_, res = model.GetUserFromID(uuuid)
 	if res != nil {
 		t.Fatalf("error occured while getting user from database:\n\t%v\n", res.Error())
 	}
