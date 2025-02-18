@@ -2,6 +2,8 @@ package src
 
 import (
 	"oggcloudserver/src/db"
+	"oggcloudserver/src/file_ops/file"
+	services "oggcloudserver/src/file_ops/session/Services"
 	"oggcloudserver/src/user/auth"
 	"oggcloudserver/src/user/model"
 	loginuser "oggcloudserver/src/user/routes/login_user"
@@ -23,6 +25,6 @@ func SetupRouter() *gin.Engine {
 
 func GetDB() (*gorm.DB, error) {
 	err := db.Create_DB()
-	db.DB.AutoMigrate(&model.User{}, &auth.AuthorizationCode{})
+	db.DB.AutoMigrate(&model.User{}, &auth.AuthorizationCode{}, &file.File{}, &services.Session{})
 	return db.DB, err
 }

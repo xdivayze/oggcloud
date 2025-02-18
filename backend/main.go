@@ -15,6 +15,7 @@ func LoadDotenv() error {
 //implement rate limiting
 //implement human test
 // -> select apo,onur,uygar,isra etc's head, leg etc
+//create auth middleware
 func main() {
 	defer os.Remove(oggcrypto.MASTERKEY_PATH)
 	err := LoadDotenv()
