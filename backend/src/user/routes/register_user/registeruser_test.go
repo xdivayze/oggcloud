@@ -28,7 +28,7 @@ func TestRegisterUser(t *testing.T) {
 	r := src.SetupRouter()
 	w := httptest.NewRecorder()
 
-	data := testing_material.GenerateUserJson(t)
+	data, _ := testing_material.GenerateUserJson(t)
 
 	endpoint := "/api/user/register"
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(data))

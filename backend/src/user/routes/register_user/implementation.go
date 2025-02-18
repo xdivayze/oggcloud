@@ -4,7 +4,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/http"
-	"oggcloudserver/src/functions"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -33,16 +32,4 @@ func processPassword(c *gin.Context, passwordhex string) (string, error) {
 	}
 	return string(bcryptPass), nil
 
-}
-
-func doFieldAssign(c *gin.Context, jsonData map[string]interface{}, fieldmap map[string]interface{}) int {
-	for field, ref := range fieldmap {
-		variable := ref.(*string)
-		res, s := functions.FieldAssignment(c, field, jsonData)
-		if s != 0 {
-			return -1
-		}
-		*variable = res
-	}
-	return 0
 }

@@ -5,14 +5,15 @@ import (
 	"log"
 	"net/http"
 	"oggcloudserver/src/db"
+	"oggcloudserver/src/functions"
 	"oggcloudserver/src/user/model"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
-//TODO email check
-//TODO implement invitation code
+// TODO email check
+// TODO implement invitation code
 func RegisterUser(c *gin.Context) {
 	log.SetPrefix("ERROR: ")
 	var jsonData map[string]interface{}
@@ -31,7 +32,7 @@ func RegisterUser(c *gin.Context) {
 	fieldmap["password"] = &passwordhex
 	fieldmap["ecdh_public"] = &ecdhclientpub
 
-	s := doFieldAssign(c, jsonData, fieldmap)
+	s := functions.DoFieldAssign(c, jsonData, fieldmap)
 	if s != 0 {
 		log.Printf("error doing field assignments, returned:%d", s)
 		return
@@ -60,6 +61,7 @@ func RegisterUser(c *gin.Context) {
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error occured registering user"})
 		log.Printf("error occured while registering user to database:\n\t%v\n", result.Error)
+		return
 	}
 	c.JSON(http.StatusCreated, gin.H{
 		"id":                  id,

@@ -12,7 +12,9 @@ import (
 func LoadDotenv() error {
 	return godotenv.Load()
 }
-
+//implement rate limiting
+//implement human test
+// -> select apo,onur,uygar,isra etc's head, leg etc
 func main() {
 	defer os.Remove(oggcrypto.MASTERKEY_PATH)
 	err := LoadDotenv()

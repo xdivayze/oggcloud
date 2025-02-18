@@ -5,7 +5,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"oggcloudserver/src"
+	"oggcloudserver/src/db"
 	"oggcloudserver/src/oggcrypto"
+	"oggcloudserver/src/user/auth"
+	"oggcloudserver/src/user/model"
 	"testing"
 
 	"github.com/joho/godotenv"
@@ -14,7 +17,12 @@ import (
 const EXAMPLE_MAIL = "example@example.org"
 const DOTENV_PATH = "/root/oggcloudserver/backend/.env"
 
-func GenerateUserJson(t *testing.T) []byte {
+func FlushDB() {
+	db.DB.Where("1 = 1").Delete(&model.User{})
+	db.DB.Where("1 = 1").Delete(&auth.AuthorizationCode{})
+}
+
+func GenerateUserJson(t *testing.T) ([]byte, string) {
 	randomBytes := make([]byte, 60)
 	_, err := rand.Read(randomBytes)
 	if err != nil {
@@ -40,7 +48,7 @@ func GenerateUserJson(t *testing.T) []byte {
 	if err != nil {
 		t.Fatalf("error serializing to json:\n\t%v\n", err)
 	}
-	return data
+	return data, randomString
 }
 
 func LoadDB(t *testing.T) {
