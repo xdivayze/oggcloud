@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"bufio"
 	"compress/gzip"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -16,6 +17,10 @@ import (
 
 	"github.com/google/uuid"
 )
+
+var PreviewExemptions = []string{} // I think it's cool that preview checksum is shown as storage checksum's preview
+
+var ErrTooEarlyToBeAPreview = errors.New("no owner for preview to be associated with an owner")
 
 func extractFile(tarReader *tar.Reader, header *tar.Header, index int, sid uuid.UUID, previewMode bool, belongsTo *file.File) error {
 	fw := strings.Split(header.Name, "/")
@@ -48,7 +53,7 @@ func extractFile(tarReader *tar.Reader, header *tar.Header, index int, sid uuid.
 	}
 	if previewMode {
 		if belongsTo == nil {
-			return fmt.Errorf("error: parent file object is nil")
+			return fmt.Errorf("error: parent file object is nil: %w", ErrTooEarlyToBeAPreview) //TODO implement case where preview directory is earlier than storage directory
 		}
 		belongsTo.PreviewID = &(fileObj.ID)
 		belongsTo.Preview = &fileObj

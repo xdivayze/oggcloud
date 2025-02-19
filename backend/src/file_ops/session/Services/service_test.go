@@ -11,9 +11,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"oggcloudserver/src"
+	"oggcloudserver/src/db"
+	"oggcloudserver/src/file_ops/file"
 	services "oggcloudserver/src/file_ops/session/Services"
+	"oggcloudserver/src/user/model"
 	"oggcloudserver/src/user/testing_material"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -24,14 +28,54 @@ import (
 const TEST_TAR = "/root/oggcloudserver/Storage/testing/uploadtest/test.tar.gz"
 
 var mode_flush = true
+var udir string
 
+func TestDBIntegrity(t *testing.T) {
+	require := require.New(t)
+	mode_flush = false
+	TestDataHandling(t)
+	mode_flush = true
+	defer func() {
+		if mode_flush {
+			testing_material.FlushDB()
+			os.RemoveAll(udir)
+		}
+	}()
+	lx := strings.Split(udir, "/")
+	id := lx[len(lx)-1]
+	var u model.User
+	var l []services.Session
+	uid, err := uuid.Parse(id)
+	require.Nil(err)
+	res := db.DB.Find(&u,uid )
+	require.Nil(res.Error)
 
+	err = db.DB.Model(&u).Association("Sessions").Find(&l)
+	require.Nil(err)
+	
+	storageDir, err := os.ReadDir(fmt.Sprintf("%s/%s/%s", udir,l[0].ID,"Storage")) 
+	require.Nil(err)
+	for _, f := range storageDir {
+		var foundFile file.File
+		res := db.DB.Where("file_name = ?", f.Name()).First(&foundFile)
+		require.Nil(res.Error)
+		if !strings.HasSuffix( foundFile.FileName, "json") {
+			require.True(foundFile.HasPreview || foundFile.IsPreview)
+			if foundFile.HasPreview {
+				var previewFile file.File
+				db.DB.Model(&foundFile).Association("Preview").Find(&previewFile)
+				require.NotNil(previewFile)
+			} 
+			
+		}
+	}
+}
 
 func TestDataHandling(t *testing.T) {
 	testing_material.LoadDotEnv(t)
 	testing_material.LoadDB(t)
 
-	func() {
+	defer func() {
 		if mode_flush {
 			testing_material.FlushDB()
 		}
@@ -41,16 +85,19 @@ func TestDataHandling(t *testing.T) {
 	r := src.SetupRouter()
 
 	id := doCreateUser(t, r)
-	udir := fmt.Sprintf("%s/%s", services.DIRECTORY_BASE, id.String())
+	udir = fmt.Sprintf("%s/%s", services.DIRECTORY_BASE, id.String())
 
-
-	defer os.RemoveAll(udir)
-
+	defer func() {
+		if mode_flush {
+			os.RemoveAll(udir)
+		}
+	}()
 
 	file, err := os.Open(TEST_TAR)
 	if err != nil {
 		t.Fatalf("error trying to open test tarball:\n\t%v\n", err)
 	}
+
 	defer file.Close()
 
 	var requestBody bytes.Buffer
