@@ -24,9 +24,15 @@ func CreateInstance(userID uuid.UUID) (*AuthorizationCode, error) {
 	}, nil
 }
 
-func (a *AuthorizationCode) IsValid()(bool) {
+func (a *AuthorizationCode) IsValid(destroy bool)(bool) {
 	diff := time.Until(a.ExpiresAt).Milliseconds()
-	return diff > 0
+	if diff <= 0 {
+		if destroy {
+			db.DB.Delete(a)
+		}
+		return false
+	}
+	return true
 }
 
 func CheckValidity(code string)(bool, error){

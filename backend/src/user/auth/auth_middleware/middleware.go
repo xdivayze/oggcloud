@@ -38,7 +38,7 @@ func VerifyCodeMiddleware() gin.HandlerFunc {
 		var authCodes []auth.AuthorizationCode
 		db.DB.Model(&u).Association("AuthorizationCodes").Find(&authCodes)
 		for _, code := range authCodes {
-			if (authCode == code.Code) && code.IsValid() {
+			if (authCode == code.Code) && code.IsValid(true) {
 				c.Next()
 				return
 			}
