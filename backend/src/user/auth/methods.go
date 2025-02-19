@@ -24,6 +24,11 @@ func CreateInstance(userID uuid.UUID) (*AuthorizationCode, error) {
 	}, nil
 }
 
+func (a *AuthorizationCode) IsValid()(bool) {
+	diff := time.Until(a.ExpiresAt).Milliseconds()
+	return diff > 0
+}
+
 func CheckValidity(code string)(bool, error){
 	auth, err := RetrieveFromDB(code)
 	if err != nil {

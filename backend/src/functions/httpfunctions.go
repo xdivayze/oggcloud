@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+
 func FieldAssignment(c *gin.Context, fieldname string, json map[string]interface{}) (string, int) {
 	field, exists := json[fieldname]
 	if !exists {

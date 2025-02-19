@@ -6,6 +6,7 @@ import (
 	"oggcloudserver/src/file_ops/session"
 	services "oggcloudserver/src/file_ops/session/Services"
 	"oggcloudserver/src/user/auth"
+	authmiddleware "oggcloudserver/src/user/auth/auth_middleware"
 	"oggcloudserver/src/user/model"
 	loginuser "oggcloudserver/src/user/routes/login_user"
 	registeruser "oggcloudserver/src/user/routes/register_user"
@@ -16,12 +17,13 @@ import (
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
-	userRoutes := r.Group("/api/user")
+	userRegisterRoutes := r.Group("/api/user")
 	{
-		userRoutes.POST("/register", registeruser.RegisterUser)
-		userRoutes.POST("/login", loginuser.LoginUser)
+		userRegisterRoutes.POST("/register", registeruser.RegisterUser)
+		userRegisterRoutes.POST("/login", loginuser.LoginUser)
 	}
-	fileRoutes := r.Group("/api/file")
+	protectedRoutes := r.Group("/", authmiddleware.VerifyCodeMiddleware())
+	fileRoutes := protectedRoutes.Group("/api/file")
 	{
 		fileRoutes.POST("/upload", session.HandleFileUpload)
 	}
