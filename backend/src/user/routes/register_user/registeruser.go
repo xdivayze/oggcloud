@@ -28,9 +28,9 @@ func RegisterUser(c *gin.Context) {
 	var ecdhclientpub string
 
 	fieldmap := make(map[string]interface{})
-	fieldmap["email"] = &mail
-	fieldmap["password"] = &passwordhex
-	fieldmap["ecdh_public"] = &ecdhclientpub
+	fieldmap[model.EMAIL_FIELDNAME] = &mail
+	fieldmap[model.PASSWORD_FIELDNAME] = &passwordhex
+	fieldmap[model.ECDH_PUB_FIELDNAME] = &ecdhclientpub
 
 	s := functions.DoFieldAssign(c, jsonData, fieldmap)
 	if s != 0 {

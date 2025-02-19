@@ -14,6 +14,7 @@ import (
 	"oggcloudserver/src/db"
 	"oggcloudserver/src/file_ops/file"
 	services "oggcloudserver/src/file_ops/session/Services"
+	"oggcloudserver/src/user/auth"
 	"oggcloudserver/src/user/model"
 	"oggcloudserver/src/user/testing_material"
 	"os"
@@ -47,26 +48,26 @@ func TestDBIntegrity(t *testing.T) {
 	var l []services.Session
 	uid, err := uuid.Parse(id)
 	require.Nil(err)
-	res := db.DB.Find(&u,uid )
+	res := db.DB.Find(&u, uid)
 	require.Nil(res.Error)
 
 	err = db.DB.Model(&u).Association("Sessions").Find(&l)
 	require.Nil(err)
-	
-	storageDir, err := os.ReadDir(fmt.Sprintf("%s/%s/%s", udir,l[0].ID,"Storage")) 
+
+	storageDir, err := os.ReadDir(fmt.Sprintf("%s/%s/%s", udir, l[0].ID, "Storage"))
 	require.Nil(err)
 	for _, f := range storageDir {
 		var foundFile file.File
 		res := db.DB.Where("file_name = ?", f.Name()).First(&foundFile)
 		require.Nil(res.Error)
-		if !strings.HasSuffix( foundFile.FileName, "json") {
+		if !strings.HasSuffix(foundFile.FileName, "json") {
 			require.True(foundFile.HasPreview || foundFile.IsPreview)
 			if foundFile.HasPreview {
 				var previewFile file.File
 				db.DB.Model(&foundFile).Association("Preview").Find(&previewFile)
 				require.NotNil(previewFile)
-			} 
-			
+			}
+
 		}
 	}
 }
@@ -84,7 +85,7 @@ func TestDataHandling(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := src.SetupRouter()
 
-	id := doCreateUser(t, r)
+	id, authcode := doCreateUser(t, r)
 	udir = fmt.Sprintf("%s/%s", services.DIRECTORY_BASE, id.String())
 
 	defer func() {
@@ -136,9 +137,14 @@ func TestDataHandling(t *testing.T) {
 		t.Fatalf("error generating new request:\n\t%v\n", err)
 	}
 
+	req.Header.Set(model.EMAIL_FIELDNAME, testing_material.EXAMPLE_MAIL)
+	req.Header.Set(auth.AUTH_CODE_FIELDNAME, authcode)
+
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
+
+	
 
 	if w.Code != http.StatusCreated {
 		t.Fatalf("status returned isnt 201 but %d", w.Code)
@@ -158,8 +164,8 @@ func TestDataHandling(t *testing.T) {
 
 }
 
-func doCreateUser(t *testing.T, r *gin.Engine) uuid.UUID {
-	userjson, _ := testing_material.GenerateUserJson(t)
+func doCreateUser(t *testing.T, r *gin.Engine) (uuid.UUID, string) {
+	userjson, password := testing_material.GenerateUserJson(t)
 	w := httptest.NewRecorder()
 	endpoint := "/api/user/register"
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(userjson))
@@ -181,5 +187,35 @@ func doCreateUser(t *testing.T, r *gin.Engine) uuid.UUID {
 	if err != nil {
 		t.Fatalf("error occured while parsing to uuid:\n\t%v\n", err)
 	}
-	return id
+	return id, doLogin(t, password, r)
+}
+
+func doLogin(t *testing.T, password string, r *gin.Engine) string {
+	jsonMap := map[string]interface{}{
+		model.EMAIL_FIELDNAME:    testing_material.EXAMPLE_MAIL,
+		model.PASSWORD_FIELDNAME: password,
+	}
+
+	jsonBytes, err := json.Marshal(jsonMap)
+	require.Nil(t, err)
+
+	endpoint := "/api/user/login"
+	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(jsonBytes))
+	require.Nil(t, err)
+	req.Header.Set("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var responseBody map[string]interface{}
+	err = json.Unmarshal(w.Body.Bytes(), &responseBody)
+	require.Nil(t, err)
+
+	auth, exists := responseBody[auth.AUTH_CODE_FIELDNAME]
+	authl := auth.(string)
+	require.True(t, exists)
+	return authl
+
 }

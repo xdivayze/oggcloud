@@ -11,7 +11,7 @@ import (
 
 func VerifyCodeMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		email := c.Request.Header.Get("email")
+		email := c.Request.Header.Get(model.EMAIL_FIELDNAME)
 		if email == "" {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "email field doesn't exist in header",
@@ -19,7 +19,7 @@ func VerifyCodeMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		authCode := c.Request.Header.Get("authCode")
+		authCode := c.Request.Header.Get(auth.AUTH_CODE_FIELDNAME)
 		if authCode == "" {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "authCode field doesn't exist in header",

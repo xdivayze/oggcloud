@@ -8,6 +8,10 @@ import (
 	"github.com/google/uuid"
 )
 
+const PASSWORD_FIELDNAME = "password"
+const EMAIL_FIELDNAME = "email"
+const ECDH_PUB_FIELDNAME = "ecdh_public"
+
 type User struct {
 	ID                 uuid.UUID `gorm:"type:uuid;primaryKey"`
 	Email              string    `gorm:"unique"`

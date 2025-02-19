@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+
 func LoginUser(c *gin.Context) {
 	log.SetPrefix("ERROR: ")
 	var jsonData map[string]interface{}
@@ -24,8 +25,8 @@ func LoginUser(c *gin.Context) {
 	var email string
 
 	fieldmap := make(map[string]interface{})
-	fieldmap["email"] = &email
-	fieldmap["password"] = &passwordhex
+	fieldmap[model.EMAIL_FIELDNAME] = &email
+	fieldmap[model.PASSWORD_FIELDNAME] = &passwordhex
 	s := functions.DoFieldAssign(c, jsonData, fieldmap)
 	if s != 0 {
 		log.Printf("error doing field assignments, returned:%d", s)
@@ -57,6 +58,6 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"authCode": code.Code, "expiresAt": code.ExpiresAt})
+	c.JSON(http.StatusOK, gin.H{auth.AUTH_CODE_FIELDNAME: code.Code, "expiresAt": code.ExpiresAt})
 
 }

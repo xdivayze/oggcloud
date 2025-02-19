@@ -44,9 +44,9 @@ func GenerateUserJson(t *testing.T) ([]byte, string) {
 	}
 
 	data, err := json.Marshal(map[string]interface{}{
-		"email":       EXAMPLE_MAIL,
-		"password":    randomString,
-		"ecdh_public": pemBlock,
+		model.EMAIL_FIELDNAME:       EXAMPLE_MAIL,
+		model.PASSWORD_FIELDNAME:    randomString,
+		model.ECDH_PUB_FIELDNAME: pemBlock,
 	})
 
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 
 const CODE_LENGTH = 32
 const CODE_VALIDATION_LENGTH_MIN = 60
+const AUTH_CODE_FIELDNAME = "authCode"
 
 type AuthorizationCode struct {
 	ID uuid.UUID `gorm:"type:uuid;primaryKey"`
