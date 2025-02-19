@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
+// preview retrievals will work by pulling the last n files
 func HandleFileUpload(c *gin.Context) {
 	sess, err := services.HandleFileUploadRequest(c)
 	if err != nil {
@@ -21,5 +21,8 @@ func HandleFileUpload(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error occured while processing files"})
 		return
 	}
+
+	
+
 	c.JSON(http.StatusCreated, gin.H{"sessionID" : sess.ID.String()})
 }

@@ -23,7 +23,7 @@ func HandleFileUpload(c *gin.Context, session *Session) error {
 	if err = os.MkdirAll(DirectorySession, 4096); err != nil {
 		return fmt.Errorf("error occured while creating directory at path:%s:\n\t%w", DirectorySession, err)
 	}
-	if err = extractTarGz(file, session.ID); err != nil {
+	if err = extractTarGz(file, session.ID, false, nil); err != nil {
 		return fmt.Errorf("error occured while extracting from tarball:\n\t%w", err)
 	}
 	return nil

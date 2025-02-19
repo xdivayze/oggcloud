@@ -27,6 +27,7 @@ func HandleFileUploadRequest(c *gin.Context) (*Session, error) {
 		SessionKey: session_key,
 		FileNumber: file_num,
 		UserID:     uid,
+		
 	}
 
 	if res := db.DB.Save(&current_session); res.Error != nil {
