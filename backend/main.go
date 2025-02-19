@@ -16,6 +16,7 @@ func LoadDotenv() error {
 //implement human test
 // -> select apo,onur,uygar,isra etc's head, leg etc
 //create auth middleware
+//feature to share files between many users
 func main() {
 	defer os.Remove(oggcrypto.MASTERKEY_PATH)
 	err := LoadDotenv()

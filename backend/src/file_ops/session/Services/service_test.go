@@ -23,25 +23,36 @@ import (
 
 const TEST_TAR = "/root/oggcloudserver/Storage/testing/uploadtest/test.tar.gz"
 
+var mode_flush = true
+
+
+
 func TestDataHandling(t *testing.T) {
 	testing_material.LoadDotEnv(t)
 	testing_material.LoadDB(t)
 
-    //defer testing_material.FlushDB()
+	func() {
+		if mode_flush {
+			testing_material.FlushDB()
+		}
+	}()
 
 	gin.SetMode(gin.TestMode)
 	r := src.SetupRouter()
 
 	id := doCreateUser(t, r)
 	udir := fmt.Sprintf("%s/%s", services.DIRECTORY_BASE, id.String())
+
+
 	defer os.RemoveAll(udir)
+
 
 	file, err := os.Open(TEST_TAR)
 	if err != nil {
 		t.Fatalf("error trying to open test tarball:\n\t%v\n", err)
 	}
 	defer file.Close()
-	
+
 	var requestBody bytes.Buffer
 	writer := multipart.NewWriter(&requestBody)
 
@@ -57,6 +68,9 @@ func TestDataHandling(t *testing.T) {
 		t.Fatalf("error occured while writing field")
 	}
 	if err = writer.WriteField("file_count", "2"); err != nil {
+		t.Fatalf("error occured while writing field")
+	}
+	if err = writer.WriteField("checksum", "943ce510ede7b561769fec1bde0b2b03d6f3df698a82d01e3de6eca8853528eb"); err != nil {
 		t.Fatalf("error occured while writing field")
 	}
 
@@ -76,7 +90,7 @@ func TestDataHandling(t *testing.T) {
 	}
 
 	req.Header.Set("Content-Type", writer.FormDataContentType())
-	w:= httptest.NewRecorder()
+	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusCreated {
@@ -92,9 +106,8 @@ func TestDataHandling(t *testing.T) {
 		t.Fatalf("error occured while parsing to uuid:\n\t%v\n", err)
 	}
 
-	
-	require.DirExists(t,fmt.Sprintf("%s/%s", udir,sid ))
-	
+	require.DirExists(t, fmt.Sprintf("%s/%s/Storage", udir, sid))
+	require.DirExists(t, fmt.Sprintf("%s/%s/Preview", udir, sid))
 
 }
 
