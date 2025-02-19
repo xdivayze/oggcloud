@@ -13,8 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
-//TODO tidy up tests and check for
-//password exceeds length
+//TODO check for
 //faulty e mail
 
 

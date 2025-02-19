@@ -2,21 +2,29 @@ package main
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"log"
 	"oggcloudserver/src"
 	"oggcloudserver/src/oggcrypto"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func LoadDotenv() error {
 	return godotenv.Load()
 }
-//implement rate limiting
-//implement human test
+
+// implement rate limiting
+// implement human test
 // -> select apo,onur,uygar,isra etc's head, leg etc
-//create auth middleware
-//feature to share files between many users
+// feature to share files between many users
+// create a queue middleware for requests concerning other users with structs in db
+// links from client to other clients through server using e2ee to share pictures( A sends B his key through
+// server so that they can both read the file) DO THIS LATER
+// When session groups are being created an option to send other users a request to view session??
+// use ecdh for multiple connections to derive a shared key
+// maybe some kind of a config file to load sessions for client
+// TODO implement file retrieval
 func main() {
 	defer os.Remove(oggcrypto.MASTERKEY_PATH)
 	err := LoadDotenv()
