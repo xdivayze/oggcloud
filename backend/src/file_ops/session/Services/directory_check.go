@@ -20,7 +20,7 @@ type directory struct {
 	path      string
 }
 
-func contains(arr []string, val string) bool {
+func contains[K comparable](arr []K, val K) bool {
 	for _, v := range arr {
 		if v == val {
 			return true
@@ -29,7 +29,7 @@ func contains(arr []string, val string) bool {
 	return false
 }
 
-func checkDirectoryValidity(r io.Reader) error {
+func checkDirectoryValidity(r io.ReadSeeker) error {
 	dirs, err := determineDirectories(r)
 	if err != nil {
 		return fmt.Errorf("error occured while determining directories:\n\t%w", err)
@@ -64,7 +64,7 @@ func doDirFieldCheck(m map[string]*directory, fields []string) error {
 	return nil
 }
 
-func determineDirectories(r io.Reader) (map[string]*directory, error) {
+func determineDirectories(r io.ReadSeeker) (map[string]*directory, error) {
 	gzipReader, err := gzip.NewReader(r)
 	if err != nil {
 		return nil, fmt.Errorf("error occured while creating new gzip reader:\n\t%w", err)
@@ -84,18 +84,22 @@ func determineDirectories(r io.Reader) (map[string]*directory, error) {
 		dir := directory{}
 
 		cleanPath := path.Clean(header.Name)
+		if cleanPath == "." {
+			continue
+		}
 		if header.Typeflag == tar.TypeDir {
-			dir.name = header.Name
-			dir.path = cleanPath
-			dirs[header.Name] = &dir
+			dir.name = cleanPath
+			dir.path = header.Name 
+			dirs[cleanPath] = &dir
 		} else if header.Typeflag == tar.TypeReg {
 			fdir := path.Dir(cleanPath)
+			lx := strings.Split(cleanPath,"/")
 			if fdir != "." {
 				dirobj, exists := func() (*directory, bool) {
-					lx := strings.Split("/", cleanPath)
-					last := lx[len(lx)-1]
-					dirobj, s := dirs[last]
-					if dirobj.path != fdir {
+					
+					dirname := lx[len(lx)-2]
+					dirobj, s := dirs[dirname]
+					if dirobj.name != fdir {
 						s = false
 					}
 					return dirobj, s
@@ -103,7 +107,7 @@ func determineDirectories(r io.Reader) (map[string]*directory, error) {
 				if !exists {
 					return nil, fmt.Errorf("orphaned file with path:\n\t%s", cleanPath)
 				}
-				dirobj.filenames = append(dirobj.filenames, header.Name)
+				dirobj.filenames = append(dirobj.filenames, lx[len(lx)-1])
 			}
 		}
 	}

@@ -21,13 +21,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const TEST_TAR = "/root/oggcloudserver/Storage/testing/test.tar.gz"
+const TEST_TAR = "/root/oggcloudserver/Storage/testing/uploadtest/test.tar.gz"
 
 func TestDataHandling(t *testing.T) {
 	testing_material.LoadDotEnv(t)
 	testing_material.LoadDB(t)
 
-    defer testing_material.FlushDB()
+    //defer testing_material.FlushDB()
 
 	gin.SetMode(gin.TestMode)
 	r := src.SetupRouter()

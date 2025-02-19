@@ -10,16 +10,18 @@ import (
 	"oggcloudserver/src/db"
 	"oggcloudserver/src/file_ops/file"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/google/uuid"
 )
 
 func extractFile(tarReader *tar.Reader, header *tar.Header, index int, sid uuid.UUID, previewMode bool, belongsTo *file.File) error {
-	fparts := strings.Split(header.Name, ".")
+	fw := strings.Split(header.Name, "/")
+	fparts := strings.Split(fw[len(fw)-1], ".")
 
 	outfilename := fmt.Sprintf("%s_%d.%s", fparts[0], index, fparts[1])
-	outFilePath := fmt.Sprintf("%s/%s", DirectorySession, outfilename)
+	outFilePath := fmt.Sprintf("%s/%s", currentWorkingPath, outfilename)
 	outFile, err := os.Create(outFilePath)
 	if err != nil {
 		return fmt.Errorf("error occured while creating file at path %s:\n\t%w", outFilePath, err)
@@ -57,21 +59,48 @@ func extractFile(tarReader *tar.Reader, header *tar.Header, index int, sid uuid.
 	return nil
 }
 
+var currentWorkingPath string
+
 // TODO add concurrency back <3
 func extractTarGz(r io.Reader, sid uuid.UUID, previewMode bool, belongsTo *file.File) error {
+	buffer := make([]byte, 1024*4)
+	f, err := os.CreateTemp("", "compressedtar*.tar.gz")
+	if err != nil {
+		return fmt.Errorf("error creating temporary file at path %s:\n\t%w", f.Name(), err)
+	}
 
-	if err := checkDirectoryValidity(r); err != nil { //ensure storage and preview directories exist and valid
+	defer os.Remove(f.Name())
+
+	if _, err = io.CopyBuffer(f, r, buffer); err != nil {
+		return fmt.Errorf("error occured while copying file to new buffer:\n\t%w", err)
+	}
+
+	if err = f.Sync(); err != nil {
+		return fmt.Errorf("error trying to sync file:\n\t%w", err)
+	}
+
+	f.Close()
+
+	f, err = os.Open(f.Name())
+	if err != nil {
+		return fmt.Errorf("error occured while opening file:\n\t%w", err)
+	}
+	defer f.Close()
+
+	if err := checkDirectoryValidity(f); err != nil { //ensure storage and preview directories exist and are valid
 		return err
 	}
-	
 
-	gzipReader, err := gzip.NewReader(r)
+	if _, err = f.Seek(0, io.SeekStart); err != nil {
+		return fmt.Errorf("error while seeking to start:\n\t%w", err)
+	}
+
+	gzipReader, err := gzip.NewReader(f)
 	index := 0
 	if err != nil {
 		return fmt.Errorf("error occured while creating new gzip reader:\n\t%w", err)
 	}
 	defer gzipReader.Close()
-
 	tarReader := tar.NewReader(gzipReader)
 	for {
 		header, err := tarReader.Next()
@@ -82,9 +111,23 @@ func extractTarGz(r io.Reader, sid uuid.UUID, previewMode bool, belongsTo *file.
 		} else if err != nil {
 			return fmt.Errorf("error occured while reading the next entry in tar reader:\n\t%v", err)
 		}
-		index += 1
-		extractFile(tarReader, header, index, sid, previewMode, belongsTo)
-
+		cp := path.Clean(header.Name)
+		if cp == "." {
+			continue
+		}
+		if header.Typeflag == tar.TypeDir && (cp == STORAGE_DIR_NAME || cp == PREVIEW_DIR_NAME) {
+			index = 0
+			currentWorkingPath = fmt.Sprintf("%s/%s", DirectorySession, cp)
+			if err = os.MkdirAll(currentWorkingPath, 4096); err != nil {
+				return fmt.Errorf("error occured creating path at %s :\n\t%w", currentWorkingPath, err)
+			}
+		}
+		if header.Typeflag == tar.TypeReg {
+			if err = extractFile(tarReader, header, index, sid, previewMode, belongsTo); err != nil {
+				return fmt.Errorf("error occured while extracting file:\n\t%w", err)
+			}
+			index += 1
+		}
 	}
 	return nil
 }
