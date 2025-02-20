@@ -40,12 +40,12 @@ func extractFile(tarReader *tar.Reader, header *tar.Header, previewMode bool, be
 		return fmt.Errorf("error occured while flushing buffered writer:\n\t%w", err)
 	}
 	var fileObj file.File
-	if res := db.DB.Where("file_name = ?", outfilename).Where("is_preview = ?", previewMode).Find(&fileObj); res.Error != nil{
+	if res := db.DB.Where("file_name = ?", outfilename).Where("is_preview = ?", previewMode).Find(&fileObj); res.Error != nil {
 		return fmt.Errorf("error occured while searching in database:\n\t%w", err)
 	}
 	size := header.FileInfo().Size()
 	fileObj.Size = size
-	if _, err =outFile.Seek(0, io.SeekStart); err != nil {
+	if _, err = outFile.Seek(0, io.SeekStart); err != nil {
 		return fmt.Errorf("error occured while seeking:\n\t%w", err)
 	}
 	sum, err := oggcrypto.CalculateSHA256sum(outFile)
@@ -55,10 +55,10 @@ func extractFile(tarReader *tar.Reader, header *tar.Header, previewMode bool, be
 	if sum != *fileObj.Checksum {
 		return fmt.Errorf("file checksum doesn't match") //TODO add a cleanup function
 	}
-	
+
 	if previewMode {
 		if belongsTo == nil {
-			return fmt.Errorf("error: parent file object is nil: %w", ErrTooEarlyToBeAPreview) //TODO implement case where preview directory is earlier than storage directory
+			return fmt.Errorf("error: parent file object is nil: %w", ErrTooEarlyToBeAPreview) 
 		}
 		belongsTo.PreviewID = &(fileObj.ID)
 		belongsTo.Preview = &fileObj
