@@ -118,7 +118,7 @@ func TestDataHandling(t *testing.T) {
 	if err = writer.WriteField("file_count", "2"); err != nil {
 		t.Fatalf("error occured while writing field")
 	}
-	if err = writer.WriteField("checksum", "943ce510ede7b561769fec1bde0b2b03d6f3df698a82d01e3de6eca8853528eb"); err != nil {
+	if err = writer.WriteField("checksum", "f788562708ca6c620f3030695e1efb9977d064cdd1c23bc0d4421d1b5b98e365"); err != nil {
 		t.Fatalf("error occured while writing field")
 	}
 

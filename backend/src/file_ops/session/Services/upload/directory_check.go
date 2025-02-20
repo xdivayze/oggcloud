@@ -3,11 +3,16 @@ package upload
 import (
 	"archive/tar"
 	"compress/gzip"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
+	"oggcloudserver/src/db"
+	"oggcloudserver/src/file_ops/file"
 	"path"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 const STORAGE_DIR_NAME = "Storage"
@@ -15,9 +20,10 @@ const PREVIEW_DIR_NAME = "Preview"
 const CHECKSUM_FILENAME = "checksum.json"
 
 type directory struct {
-	filenames []string
-	name      string
-	path      string
+	filenames           []string
+	checksumFileContent *checksumFileStructure
+	name                string
+	path                string
 }
 
 func contains[K comparable](arr []K, val K) bool {
@@ -29,7 +35,38 @@ func contains[K comparable](arr []K, val K) bool {
 	return false
 }
 
-func checkDirectoryValidity(r io.ReadSeeker) error {
+type checksumFileStructure struct {
+	Preview bool
+	Files   []struct {
+		Checksum string
+		Filetype string
+		Filename string
+	}
+}
+
+func createFileInstancesDB(data *checksumFileStructure, session *Session) error {
+	for _, descriptor := range data.Files {
+
+		lx := strings.Split(descriptor.Filename, ".")
+		dbname := fmt.Sprintf("%s.%s", lx[0], lx[1])
+		u := file.File{
+			ID:         uuid.New(),
+			FileName:   dbname,
+			SessionID:  session.ID,
+			IsPreview:  data.Preview,
+			FileType:   &descriptor.Filetype,
+			Checksum:   &descriptor.Checksum,
+			HasPreview: !data.Preview,
+		}
+		res := db.DB.Create(&u)
+		if res.Error != nil {
+			return fmt.Errorf("error occured while saving to db")
+		}
+	}
+	return nil
+}
+
+func checkDirectoryValidity(r io.ReadSeeker, session *Session) error {
 	dirs, err := determineDirectories(r)
 	if err != nil {
 		return fmt.Errorf("error occured while determining directories:\n\t%w", err)
@@ -50,6 +87,13 @@ func checkDirectoryValidity(r io.ReadSeeker) error {
 	}
 	if !contains(preview_dir.filenames, CHECKSUM_FILENAME) {
 		return fmt.Errorf("preview directory doesn't contain checksum file")
+	}
+
+	if err = createFileInstancesDB(dirs[STORAGE_DIR_NAME].checksumFileContent, session); err != nil {
+		return fmt.Errorf("error occured occured while creating db instances for %s\n\t%w", STORAGE_DIR_NAME, err)
+	}
+	if err = createFileInstancesDB(dirs[PREVIEW_DIR_NAME].checksumFileContent, session); err != nil {
+		return fmt.Errorf("error occured occured while creating db instances for %s\n\t%w", PREVIEW_DIR_NAME, err)
 	}
 
 	return nil
@@ -89,14 +133,14 @@ func determineDirectories(r io.ReadSeeker) (map[string]*directory, error) {
 		}
 		if header.Typeflag == tar.TypeDir {
 			dir.name = cleanPath
-			dir.path = header.Name 
+			dir.path = header.Name
 			dirs[cleanPath] = &dir
 		} else if header.Typeflag == tar.TypeReg {
 			fdir := path.Dir(cleanPath)
-			lx := strings.Split(cleanPath,"/")
+			lx := strings.Split(cleanPath, "/")
 			if fdir != "." {
 				dirobj, exists := func() (*directory, bool) {
-					
+
 					dirname := lx[len(lx)-2]
 					dirobj, s := dirs[dirname]
 					if dirobj.name != fdir {
@@ -106,6 +150,17 @@ func determineDirectories(r io.ReadSeeker) (map[string]*directory, error) {
 				}()
 				if !exists {
 					return nil, fmt.Errorf("orphaned file with path:\n\t%s", cleanPath)
+				}
+				if lx[len(lx)-1] == CHECKSUM_FILENAME {
+					buf, err := io.ReadAll(tarReader)
+					if err != nil {
+						return nil, fmt.Errorf("error while reading from tar reader:\n\t%w", err)
+					}
+					var unmarshaledJson checksumFileStructure
+					if err := json.Unmarshal(buf, &unmarshaledJson); err != nil {
+						return nil, fmt.Errorf("error while unmarshaling json:\n\t%w", err)
+					}
+					dirobj.checksumFileContent = &unmarshaledJson
 				}
 				dirobj.filenames = append(dirobj.filenames, lx[len(lx)-1])
 			}

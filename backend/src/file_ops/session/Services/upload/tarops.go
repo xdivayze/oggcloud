@@ -14,19 +14,17 @@ import (
 	"os"
 	"path"
 	"strings"
-
-	"github.com/google/uuid"
 )
 
 var PreviewExemptions = []string{} // I think it's cool that preview checksum is shown as storage checksum's preview
 
 var ErrTooEarlyToBeAPreview = errors.New("no owner for preview to be associated with an owner")
 
-func extractFile(tarReader *tar.Reader, header *tar.Header, index int, sid uuid.UUID, previewMode bool, belongsTo *file.File) error {
+func extractFile(tarReader *tar.Reader, header *tar.Header, previewMode bool, belongsTo *file.File) error {
 	fw := strings.Split(header.Name, "/")
 	fparts := strings.Split(fw[len(fw)-1], ".")
 
-	outfilename := fmt.Sprintf("%s_%d.%s", fparts[0], index, fparts[1])
+	outfilename := fmt.Sprintf("%s.%s", fparts[0], fparts[1])
 	outFilePath := fmt.Sprintf("%s/%s", currentWorkingPath, outfilename)
 	outFile, err := os.Create(outFilePath)
 	if err != nil {
@@ -41,16 +39,23 @@ func extractFile(tarReader *tar.Reader, header *tar.Header, index int, sid uuid.
 	if err = bufw.Flush(); err != nil {
 		return fmt.Errorf("error occured while flushing buffered writer:\n\t%w", err)
 	}
-	id := uuid.New()
-	fileObj := file.File{
-		ID:         id,
-		FileName:   outfilename,
-		Size:       header.FileInfo().Size(),
-		SessionID:  sid,
-		IndexNo: index,
-		IsPreview:  false,
-		HasPreview: false,
+	var fileObj file.File
+	if res := db.DB.Where("file_name = ?", outfilename).Where("is_preview = ?", previewMode).Find(&fileObj); res.Error != nil{
+		return fmt.Errorf("error occured while searching in database:\n\t%w", err)
 	}
+	size := header.FileInfo().Size()
+	fileObj.Size = size
+	if _, err =outFile.Seek(0, io.SeekStart); err != nil {
+		return fmt.Errorf("error occured while seeking:\n\t%w", err)
+	}
+	sum, err := oggcrypto.CalculateSHA256sum(outFile)
+	if err != nil {
+		return fmt.Errorf("error occured while calculating checksum:\n\t%w", err)
+	}
+	if sum != *fileObj.Checksum {
+		return fmt.Errorf("file checksum doesn't match") //TODO add a cleanup function
+	}
+	
 	if previewMode {
 		if belongsTo == nil {
 			return fmt.Errorf("error: parent file object is nil: %w", ErrTooEarlyToBeAPreview) //TODO implement case where preview directory is earlier than storage directory
@@ -63,10 +68,9 @@ func extractFile(tarReader *tar.Reader, header *tar.Header, index int, sid uuid.
 		if res.Error != nil {
 			return fmt.Errorf("error occured while updating the owner file instance:\n\t%w", res.Error)
 		}
-		return nil
 
 	}
-	if res := db.DB.Create(&fileObj); res.Error != nil {
+	if res := db.DB.Save(&fileObj); res.Error != nil {
 		return fmt.Errorf("error occured while saving to db:\n\t%w", res.Error)
 	}
 	return nil
@@ -95,7 +99,7 @@ func extractTarGz(r io.Reader, session *Session) error {
 		return fmt.Errorf("checksum no match")
 	}
 
-	if err := checkDirectoryValidity(f); err != nil { //ensure storage and preview directories exist and are valid
+	if err := checkDirectoryValidity(f, session); err != nil { //ensure storage and preview directories exist and are valid
 		return err
 	}
 
@@ -104,7 +108,6 @@ func extractTarGz(r io.Reader, session *Session) error {
 	}
 
 	gzipReader, err := gzip.NewReader(f)
-	index := 0
 	if err != nil {
 		return fmt.Errorf("error occured while creating new gzip reader:\n\t%w", err)
 	}
@@ -125,13 +128,12 @@ func extractTarGz(r io.Reader, session *Session) error {
 			continue
 		}
 		if header.Typeflag == tar.TypeDir && (lx[len(lx)-1] == STORAGE_DIR_NAME || lx[len(lx)-1] == PREVIEW_DIR_NAME) {
-			index = 0
 			currentWorkingPath = fmt.Sprintf("%s/%s", DirectorySession, cp)
 			if err = os.MkdirAll(currentWorkingPath, 4096); err != nil {
 				return fmt.Errorf("error occured creating path at %s :\n\t%w", currentWorkingPath, err)
 			}
 		}
-		if header.Typeflag == tar.TypeReg {
+		if header.Typeflag == tar.TypeReg && (lx[len(lx)-1] != CHECKSUM_FILENAME) {
 			previewLoadingMode := false
 			var owningFileRef *file.File
 			owningFileRef = nil
@@ -147,11 +149,10 @@ func extractTarGz(r io.Reader, session *Session) error {
 				}
 
 			}
-
-			if err = extractFile(tarReader, header, index, session.ID, previewLoadingMode, owningFileRef); err != nil {
+			err = extractFile(tarReader, header, previewLoadingMode, owningFileRef)
+			if err != nil {
 				return fmt.Errorf("error occured while extracting file:\n\t%w", err)
 			}
-			index += 1
 		}
 	}
 	return nil

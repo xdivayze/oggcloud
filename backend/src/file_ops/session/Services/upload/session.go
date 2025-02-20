@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"oggcloudserver/src/db"
 	"oggcloudserver/src/file_ops/file"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -29,10 +28,7 @@ func (s *Session) FindOwnedFileWithName(name string) (*file.File, error) {
 		return nil, fmt.Errorf("error occured while finding associations:\n\t%w", err)
 	}
 	for _, f := range files {
-		destroyedFileName0 := strings.Split(f.FileName, ".")
-		destroyedFileName := strings.Split( destroyedFileName0[0], "_")[0]
-		dbName := fmt.Sprintf("%s.%s", destroyedFileName, destroyedFileName0[1])
-		if dbName == name {
+		if f.FileName == name {
 			return &f, nil
 		}
 	}

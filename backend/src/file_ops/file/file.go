@@ -11,12 +11,12 @@ type File struct {
 	FileName   string
 	Size       int64
 	SessionID  uuid.UUID
-	IndexNo 	int
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
-	Checksum   string
+	FileType   *string
+	Checksum   *string
 	HasPreview bool
-	IsPreview bool
+	IsPreview  bool
 	PreviewID  *uuid.UUID `gorm:"index"`
 	Preview    *File      `gorm:"foreignKey:PreviewID"`
 }
