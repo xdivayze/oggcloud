@@ -1,4 +1,4 @@
-package services_test
+package upload_test
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 	"oggcloudserver/src"
 	"oggcloudserver/src/db"
 	"oggcloudserver/src/file_ops/file"
-	services "oggcloudserver/src/file_ops/session/Services"
+	"oggcloudserver/src/file_ops/session/Services/upload"
 	"oggcloudserver/src/user/auth"
 	"oggcloudserver/src/user/model"
 	"oggcloudserver/src/user/testing_material"
@@ -45,7 +45,7 @@ func TestDBIntegrity(t *testing.T) {
 	lx := strings.Split(udir, "/")
 	id := lx[len(lx)-1]
 	var u model.User
-	var l []services.Session
+	var l []upload.Session
 	uid, err := uuid.Parse(id)
 	require.Nil(err)
 	res := db.DB.Find(&u, uid)
@@ -86,7 +86,7 @@ func TestDataHandling(t *testing.T) {
 	r := src.SetupRouter()
 
 	id, authcode := doCreateUser(t, r)
-	udir = fmt.Sprintf("%s/%s", services.DIRECTORY_BASE, id.String())
+	udir = fmt.Sprintf("%s/%s", upload.DIRECTORY_BASE, id.String())
 
 	defer func() {
 		if mode_flush {

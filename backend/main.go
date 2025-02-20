@@ -14,6 +14,8 @@ func LoadDotenv() error {
 	return godotenv.Load()
 }
 
+// user access levels????
+// forward requests through a dpi tunnel to surpass censorship
 // implement rate limiting
 // implement human test
 // -> select apo,onur,uygar,isra etc's head, leg etc

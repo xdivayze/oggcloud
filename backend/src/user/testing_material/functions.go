@@ -7,7 +7,7 @@ import (
 	"oggcloudserver/src"
 	"oggcloudserver/src/db"
 	"oggcloudserver/src/file_ops/file"
-	services "oggcloudserver/src/file_ops/session/Services"
+	"oggcloudserver/src/file_ops/session/Services/upload"
 	"oggcloudserver/src/oggcrypto"
 	"oggcloudserver/src/user/auth"
 	"oggcloudserver/src/user/model"
@@ -22,7 +22,7 @@ const DOTENV_PATH = "/root/oggcloudserver/backend/.env"
 func FlushDB() {
 	db.DB.Where("1 = 1").Delete(&model.User{})
 	db.DB.Where("1 = 1").Delete(&auth.AuthorizationCode{})
-	db.DB.Where("1 = 1").Delete(&services.Session{})
+	db.DB.Where("1 = 1").Delete(&upload.Session{})
 	db.DB.Where("1 = 1").Delete(&file.File{})
 }
 
