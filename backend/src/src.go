@@ -4,6 +4,7 @@ import (
 	"oggcloudserver/src/db"
 	"oggcloudserver/src/file_ops/file"
 	"oggcloudserver/src/file_ops/session"
+	"oggcloudserver/src/file_ops/session/Services/retrieve"
 	upload "oggcloudserver/src/file_ops/session/Services/upload"
 	"oggcloudserver/src/user/auth"
 	authmiddleware "oggcloudserver/src/user/auth/auth_middleware"
@@ -26,6 +27,7 @@ func SetupRouter() *gin.Engine {
 	fileRoutes := protectedRoutes.Group("/api/file")
 	{
 		fileRoutes.POST("/upload", session.HandleFileUpload)
+		fileRoutes.GET("/retrieve", retrieve.HandleRetrieve)
 	}
 	return r
 }

@@ -26,6 +26,7 @@ func LoadDotenv() error {
 // When session groups are being created an option to send other users a request to view session??
 // use ecdh for multiple connections to derive a shared key
 // maybe some kind of a config file to load sessions for client
+//TODO SHARED ALBUMS + feature to add stuff to created albums
 // TODO implement file retrieval
 func main() {
 	defer os.Remove(oggcrypto.MASTERKEY_PATH)

@@ -53,6 +53,7 @@ func createFileInstancesDB(data *checksumFileStructure, session *Session) error 
 			ID:         uuid.New(),
 			FileName:   dbname,
 			SessionID:  session.ID,
+			UserID:     session.UserID,
 			IsPreview:  data.Preview,
 			FileType:   &descriptor.Filetype,
 			Checksum:   &descriptor.Checksum,

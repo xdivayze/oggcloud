@@ -13,6 +13,7 @@ type File struct {
 	SessionID  uuid.UUID
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
+	UserID uuid.UUID
 	FileType   *string
 	Checksum   *string
 	HasPreview bool

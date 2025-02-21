@@ -1,6 +1,7 @@
 package model
 
 import (
+	"oggcloudserver/src/file_ops/file"
 	"oggcloudserver/src/file_ops/session/Services/upload"
 	"oggcloudserver/src/user/auth"
 	"time"
@@ -18,7 +19,8 @@ type User struct {
 	PasswordHash       *string
 	EcdhSharedKey      *string
 	AuthorizationCodes []auth.AuthorizationCode `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
-	Sessions           []upload.Session       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	Sessions           []upload.Session         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	Files              []file.File              `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 	CreatedAt          time.Time
 	UpdatedAt          time.Time
 }
