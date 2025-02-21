@@ -28,7 +28,8 @@ import (
 const TEST_TAR = "/root/oggcloudserver/Storage/testing/uploadtest/test.tar.gz"
 
 var ModeFlush = true
-var udir string
+var Udir string
+var Auth string
 
 func TestDBIntegrity(t *testing.T) {
 	require := require.New(t)
@@ -38,10 +39,10 @@ func TestDBIntegrity(t *testing.T) {
 	defer func() {
 		if ModeFlush {
 			FlushDB()
-			os.RemoveAll(udir)
+			os.RemoveAll(Udir)
 		}
 	}()
-	lx := strings.Split(udir, "/")
+	lx := strings.Split(Udir, "/")
 	id := lx[len(lx)-1]
 	var u model.User
 	var l []upload.Session
@@ -53,7 +54,7 @@ func TestDBIntegrity(t *testing.T) {
 	err = db.DB.Model(&u).Association("Sessions").Find(&l)
 	require.Nil(err)
 
-	storageDir, err := os.ReadDir(fmt.Sprintf("%s/%s/%s", udir, l[0].ID, "Storage"))
+	storageDir, err := os.ReadDir(fmt.Sprintf("%s/%s/%s", Udir, l[0].ID, "Storage"))
 	require.Nil(err)
 	for _, f := range storageDir {
 		var foundFile file.File
@@ -85,11 +86,11 @@ func TestDataHandling(t *testing.T) {
 	r := src.SetupRouter()
 
 	id, authcode := DoCreateUser(t, r)
-	udir = fmt.Sprintf("%s/%s", upload.DIRECTORY_BASE, id.String())
+	Udir = fmt.Sprintf("%s/%s", upload.DIRECTORY_BASE, id.String())
 
 	defer func() {
 		if ModeFlush {
-			os.RemoveAll(udir)
+			os.RemoveAll(Udir)
 		}
 	}()
 
@@ -156,8 +157,8 @@ func TestDataHandling(t *testing.T) {
 		t.Fatalf("error occured while parsing to uuid:\n\t%v\n", err)
 	}
 
-	require.DirExists(t, fmt.Sprintf("%s/%s/Storage", udir, sid))
-	require.DirExists(t, fmt.Sprintf("%s/%s/Preview", udir, sid))
+	require.DirExists(t, fmt.Sprintf("%s/%s/Storage", Udir, sid))
+	require.DirExists(t, fmt.Sprintf("%s/%s/Preview", Udir, sid))
 
 }
 
@@ -213,6 +214,7 @@ func DoLogin(t *testing.T, password string, r *gin.Engine) string {
 	auth, exists := responseBody[auth.AUTH_CODE_FIELDNAME]
 	authl := auth.(string)
 	require.True(t, exists)
+	Auth = authl
 	return authl
 
 }
