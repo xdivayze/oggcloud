@@ -1,10 +1,13 @@
 package retrieve_test
 
 import (
+	"io"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"oggcloudserver/src"
 	"oggcloudserver/src/file_ops/session/Services/retrieve"
+	"oggcloudserver/src/oggcrypto"
 	"oggcloudserver/src/user/auth"
 	"oggcloudserver/src/user/model"
 	"oggcloudserver/src/user/testing_material"
@@ -20,6 +23,7 @@ func TestDownloadIntegrity(t *testing.T) {
 
 	testing_material.ModeFlush = false
 	testing_material.TestDataHandling(t)
+	//panic("a")
 	testing_material.ModeFlush = true
 
 	defer func() {
@@ -46,6 +50,36 @@ func TestDownloadIntegrity(t *testing.T) {
 
 	r.ServeHTTP(w, req)
 
-	req.FormFile("file") //retrieve file, write etc
+	require.Equal(w.Code, http.StatusOK)
+
+	multipartValMap := make(map[string]string)
+	var calculatedSum string
+
+	reader := multipart.NewReader(w.Body, w.Header().Get("Content-Type")[len("multipart/form-data; boundary="):])
+	for {
+		part, err := reader.NextPart()
+		if err == io.EOF {
+			break
+		}
+		require.Nil(err)
+
+		formName := part.FormName()
+		fileName := part.FileName()
+		if fileName != "" {
+			var err error
+			calculatedSum, err = oggcrypto.CalculateSHA256sum(part)
+			require.Nil(err)
+
+		} else if formName != "" {
+			val, err := io.ReadAll(part)
+			require.Nil(err)
+			multipartValMap[formName] = string(val)
+		}
+
+		part.Close()
+
+	}
+
+	require.Equal(calculatedSum, multipartValMap["checksum"])
 
 }

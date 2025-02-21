@@ -23,13 +23,13 @@ func getFileWithOffset(c *gin.Context) (*file.File, error) {
 		return nil, fmt.Errorf("error occured while initializing variables:\n\t%w", err)
 	}
 
-	var foundFile *file.File
+	foundFile := file.File{}
 
-	if res := db.DB.Where("user_id = ?", foundUser.ID).Where("is_preview = ?", wantPreview).Order("created_at DESC").Offset(offset).First(&foundFile); res.Error != nil {
+	if res := db.DB.Where("user_id = ?", foundUser.ID).Where("is_preview = ?", wantPreview).Order("created_at DESC").Offset(offset).Limit(1).Find(&foundFile); res.Error != nil {
 		return nil, fmt.Errorf("error finding described user:\n\t%w", res.Error)
 	}
 
-	return foundFile, nil
+	return &foundFile, nil
 
 }
 

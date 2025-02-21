@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"oggcloudserver/src/db"
 	"oggcloudserver/src/file_ops/file"
+	"oggcloudserver/src/user/model"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -39,6 +40,13 @@ func HandleRetrieve(c *gin.Context) { //work with offset get requests, not multi
 				return
 			}
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while trying to find file"})
+			return
+		}
+		var u *model.User
+		db.DB.Where("email = ?", c.GetHeader("email")).Find(u)
+		if returnedFile.UserID != u.ID {
+			log.Printf("user doesn't own requested file")
+			c.Status(http.StatusForbidden)
 			return
 		}
 

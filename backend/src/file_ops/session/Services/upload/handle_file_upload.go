@@ -13,7 +13,7 @@ var DirectorySession string
 
 func HandleFileUpload(c *gin.Context, session *Session) error {
 	log.SetPrefix("ERR: ")
-	file, _, err := c.Request.FormFile("file")
+	file, _, err := c.Request.FormFile("file") //TODO change this stuff with a multipart reader https://gist.github.com/ZenGround0/49e4a1aa126736f966a1dfdcb84abdae 
 	if err != nil {
 		return fmt.Errorf("error occured while retrieving file from form:\n\t%w", err)
 	}
