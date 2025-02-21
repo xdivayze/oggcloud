@@ -17,7 +17,7 @@ const PULL_METHOD_FIELD = "pullMethod"
 
 func HandleRetrieve(c *gin.Context) { //work with offset get requests, not multiple photos at one request or ID
 	log.SetPrefix("ERR: ")
-	var returnedFile *file.File
+	returnedFile := &file.File{}
 	if c.Request.Header.Get(PULL_METHOD_FIELD) == "offset" {
 		var err error
 		returnedFile, err = getFileWithOffset(c)
@@ -42,7 +42,7 @@ func HandleRetrieve(c *gin.Context) { //work with offset get requests, not multi
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while trying to find file"})
 			return
 		}
-		var u *model.User
+		u := &model.User{}
 		db.DB.Where("email = ?", c.GetHeader("email")).Find(u)
 		if returnedFile.UserID != u.ID {
 			log.Printf("user doesn't own requested file")
