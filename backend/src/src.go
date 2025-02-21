@@ -28,6 +28,7 @@ func SetupRouter() *gin.Engine {
 	{
 		fileRoutes.POST("/upload", session.HandleFileUpload)
 		fileRoutes.GET("/retrieve", retrieve.HandleRetrieve)
+		fileRoutes.GET("/retrieve/getownerid", retrieve.GetOwnerFileIDFromPreviewID)
 	}
 	return r
 }

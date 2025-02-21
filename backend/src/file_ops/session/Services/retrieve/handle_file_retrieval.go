@@ -17,7 +17,7 @@ import (
 const FILE_ID_FIELD = "fileID"
 const PULL_METHOD_FIELD = "pullMethod"
 
-func GetOwnerFileIDFromPreviewID(c *gin.Context) {
+func GetOwnerFileIDFromPreviewID(c *gin.Context) { 
 	foundFile := &file.File{}
 	foundUser := &model.User{}
 
