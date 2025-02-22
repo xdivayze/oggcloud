@@ -1,10 +1,12 @@
 package retrieve
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
+	"oggcloudserver/src/db"
 	"oggcloudserver/src/file_ops/file"
 	"oggcloudserver/src/file_ops/session/Services/upload"
 	"os"
@@ -12,6 +14,7 @@ import (
 	"sync"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func doLoadFileAndStream(c *gin.Context, f *file.File) error {
@@ -30,6 +33,14 @@ func doLoadFileAndStream(c *gin.Context, f *file.File) error {
 	}
 	defer loadedFile.Close()
 
+	currSession := upload.Session{}
+	if err = db.DB.Where("id = ?", f.SessionID).Find(&currSession).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("no session with file id found")
+		}
+		return fmt.Errorf("error occured while finding session with given id")
+	}
+
 	pr, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
 
@@ -37,6 +48,7 @@ func doLoadFileAndStream(c *gin.Context, f *file.File) error {
 		"fileID":    f.ID.String(),
 		"checksum":  *f.Checksum,
 		"fileType":  *f.FileType,
+		"sessionKey" : currSession.SessionKey,
 		"fileName":  f.FileName,
 		"isPreview": strconv.FormatBool(f.IsPreview),
 	}
@@ -74,7 +86,6 @@ func doLoadFileAndStream(c *gin.Context, f *file.File) error {
 	c.Status(http.StatusOK)
 
 	if _, err := io.Copy(c.Writer, pr); err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
 		return fmt.Errorf("error occured while streaming file to client:\n\t%w", err)
 	}
 	wg.Wait()
