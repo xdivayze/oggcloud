@@ -88,7 +88,7 @@ func TestDownloadIntegrityID(t *testing.T) {
 
 	require.NotEmpty(id)
 
-	{ //get file id
+	{ //get file from id
 		req, err := http.NewRequest("GET", endpoint, nil)
 		require.Nil(err)
 

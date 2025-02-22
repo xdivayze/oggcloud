@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type File struct {
+type File struct { //TODO implement a controller route to add additional owners; og owner creates a link through a function sends it to people they can also become additional owners; this requires files to be decrypted, and reencrypted through ecdh 
 	ID         uuid.UUID `gorm:"type:uuid;primaryKey"`
 	FileName   string
 	Size       int64
