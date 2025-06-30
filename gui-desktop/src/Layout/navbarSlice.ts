@@ -1,13 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit"
 
 interface NavbarState {
-  items: [string, string, string, string, string],
+  items: { placeholder: string; navigateTo: string; }[],
   isCollapsed: boolean
 }
 
 const initialState: NavbarState = {
   isCollapsed: true,
-  items: ["OGGLabs", "Home", "Login", "Register", "Help"]
+  items: [{ placeholder: "OGGLabs", navigateTo: "/about" }, { placeholder: "Home", navigateTo: "/" },
+  { placeholder: "Login", navigateTo: "/login" },
+  { placeholder: "Sign Up", navigateTo: "/sign-up" }, { placeholder: "Help", navigateTo: "/help" }]
 }
 
 const navbarSlice = createSlice({
