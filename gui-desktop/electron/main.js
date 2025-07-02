@@ -8,6 +8,10 @@ const createWindow = () => {
   const win = new BrowserWindow({
     width: WIN_WIDTH,
     height: WIN_HEIGHT,
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+    }
 
   })
 

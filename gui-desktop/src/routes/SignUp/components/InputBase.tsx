@@ -4,11 +4,11 @@ export default function InputBase() {
   return (
     <div className="w-full h-full flex flex-row justify-between font-roboto_slab 
       text-2xl text-yellow-ogg-0 text-center ">
-      <div className="w-2/5 h-full p-2">
+      <div className="md:w-2/5 sm:w-1/2 h-full p-2">
 
         <EmailCol />
       </div>
-      <div className="w-2/5 h-full p-2">
+      <div className="md:w-2/5 sm:w-1/2 h-full p-2">
         <PasswordCol />
       </div>
 
