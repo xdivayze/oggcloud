@@ -1,7 +1,8 @@
 import { Route, Routes } from "react-router-dom";
 import Layout from "./Layout/Layout";
 import SignUp from "./routes/SignUp/SignUp";
-import Login from "./routes/Login/Login";
+import { Library } from "./routes/Library/Library";
+import { Login } from "./routes/Login/Login";
 
 export default function App() {
   return (
@@ -9,6 +10,9 @@ export default function App() {
       <Route element={<Layout />} path="/">
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/secure">
+          <Route path="library" element={<Library />} />
+        </Route>
       </Route>
     </Routes>
   )

@@ -1,15 +1,26 @@
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "../../app/store"
 import ButtonBody from "./Components/ButtonBody"
 import VerifyIdentity from "./Components/VerifyIdentity"
 import GenericBar from "../SignUp/components/GenericBar"
 
-export default function Login() {
+import { useEffect } from "react"
+import { centerNavbarTitle } from "../../Layout/navbarSlice"
+
+export const LoginNavbarObj = { placeholder: "Login", navigateTo: "/login" }
+
+
+export function Login() {
   const isCollapsed = useSelector((state: RootState) => state.navbar.isCollapsed)
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(centerNavbarTitle(LoginNavbarObj))
+  }, [])
   return (
     <div className="w-full h-full flex flex-col px-3">
 
-      <div className={`w-full text-center text-indigo-ogg-0 text-4xl font-roboto_slab ease-in-out transition-opacity duration-100 ${!isCollapsed && "opacity-0"}`}>
+      <div className={`w-full text-center text-indigo-ogg-0 text-4xl 
+font-roboto_slab ease-in-out transition-opacity duration-100 ${!isCollapsed && "opacity-0"}`}>
         LOGIN
       </div>
       <div className="w-full flex flex-col items-center mt-[100px]">

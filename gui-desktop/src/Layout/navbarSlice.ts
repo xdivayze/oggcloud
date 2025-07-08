@@ -1,4 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit"
+import { LibraryNavbarObj } from "../routes/Library/Library";
+import { LoginNavbarObj } from "../routes/Login/Login";
 
 interface NavbarState {
   items: { placeholder: string; navigateTo: string; }[],
@@ -7,9 +9,9 @@ interface NavbarState {
 
 const initialState: NavbarState = {
   isCollapsed: true,
-  items: [{ placeholder: "OGGLabs", navigateTo: "/about" }, { placeholder: "Home", navigateTo: "/" },
-  { placeholder: "Login", navigateTo: "/login" },
-  { placeholder: "Sign Up", navigateTo: "/sign-up" }, { placeholder: "Help", navigateTo: "/help" }]
+  items: [{ placeholder: "OGGLabs", navigateTo: "/about" }, { placeholder: "Home", navigateTo: "/" }
+    , LoginNavbarObj,
+  { placeholder: "Sign Up", navigateTo: "/sign-up" }, LibraryNavbarObj]
 }
 
 const navbarSlice = createSlice({
@@ -24,10 +26,26 @@ const navbarSlice = createSlice({
     },
     setItems: (state, action) => {
       state.items = action.payload
+    },
+    centerNavbarTitle: (state, action: { payload: { placeholder: string; navigateTo: string; }, type: string }) => {
+      const newNavbarItems = [...state.items]
+      let foundIndex = 0
+      for (let i = 0; i < newNavbarItems.length; i++) {
+        if (newNavbarItems[i].placeholder === action.payload.placeholder) {
+          foundIndex = i
+          break
+        }
+
+      }
+
+      newNavbarItems.splice(foundIndex, 1)
+      newNavbarItems.splice(2, 0, action.payload)
+      state.items = newNavbarItems
+
     }
   }
 })
 const navbarReducer = navbarSlice.reducer
 export default navbarReducer
-export const { setIsCollapsed, toggleIsCollapsed, setItems } = navbarSlice.actions
+export const { setIsCollapsed, toggleIsCollapsed, setItems, centerNavbarTitle } = navbarSlice.actions
 
