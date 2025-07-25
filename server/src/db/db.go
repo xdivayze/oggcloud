@@ -4,15 +4,18 @@ import (
 	"fmt"
 	"os"
 
+	"log"
+
+	"github.com/xdivayze/oggcloud/src/models/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
 )
 
 var DB *gorm.DB
 
-var TABLES = []interface{}{ //list of db models to auto migrate
+var TABLES = []any{ //list of db models to auto migrate
 
+	&user.User{},
 }
 
 func ConnectDB() error {
