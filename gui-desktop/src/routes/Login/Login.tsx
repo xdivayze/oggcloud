@@ -12,6 +12,7 @@ export const LoginNavbarObj = { placeholder: "Login", navigateTo: "/login" }
 
 export function Login() {
   const isCollapsed = useSelector((state: RootState) => state.navbar.isCollapsed)
+
   const dispatch = useDispatch()
   useEffect(() => {
     dispatch(centerNavbarTitle(LoginNavbarObj))
