@@ -14,7 +14,7 @@ const initialState: LoginSlice = {
 const loginSlice = createSlice({
   name: "login",
   initialState,
-  reducers: {
+  reducers: { 
     setEMail: (state, action) => {
       state.eMail = action.payload
     },

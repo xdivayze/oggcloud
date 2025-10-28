@@ -16,6 +16,7 @@ export default function Navbar() {
   return (
     <div className="w-full h-full flex flex-col justify-center items-center">
       <div onMouseEnter={() => {
+        console.log("hi")
         dispatch(setIsCollapsed(false))
       }} onMouseLeave={() => {
         dispatch(setIsCollapsed(true))

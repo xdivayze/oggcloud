@@ -1,0 +1,1 @@
+export const LoginNavbarObj = { placeholder: "Login", navigateTo: "/login" }
