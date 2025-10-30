@@ -9,7 +9,7 @@ import { centerNavbarTitle } from "../../Layout/navbarSlice";
 import { sendLoginRequest } from "./implementation";
 import { LoginNavbarObj } from "../../Layout/navItems";
 
-export const SubmitTestID = "login-submit-btn";
+export const LoginSubmitTestID = "login-submit-btn";
 
 export function Login() {
   const isCollapsed = useSelector(
@@ -41,7 +41,7 @@ font-roboto_slab ease-in-out transition-opacity duration-100 ${
       </div>
       <div className="md:w-2/5 w-1/2 ml-auto flex flex-col items-center mt-[100px] ">
         <VerifyIdentity />
-        {errorOccured && (
+        {(errorOccured && !loginPending) && (
           <div className="w-full text-red-500 px-5 py-2">
             {" "}
             {/* display error message when errorOccured is non-nil */}
@@ -50,7 +50,7 @@ font-roboto_slab ease-in-out transition-opacity duration-100 ${
         )}
         <div className="w-full h-[119px] px-4 py-2">
           <GenericBar
-            testID={SubmitTestID}
+            testID={LoginSubmitTestID}
             onClick={async () => {
               setErrorOccured("");
               setLoginPending(true);

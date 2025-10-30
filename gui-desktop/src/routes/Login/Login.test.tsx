@@ -1,8 +1,8 @@
 import axios from "axios";
 import { describe, it, vi, type Mock, expect, beforeEach } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { Login, SubmitTestID } from "./Login";
-import { EMailSpanTestID, PasswdSpanTestID } from "./Components/ButtonBody";
+import { Login, LoginSubmitTestID } from "./Login";
+import { LoginEMailSpanTestID, LoginPasswdSpanTestID } from "./Components/ButtonBody";
 import { sha256 } from "@noble/hashes/sha2.js";
 import { LOGIN_ENDPOINT, type ILoginRequest } from "./implementation";
 import { Provider } from "react-redux";
@@ -16,7 +16,7 @@ describe("Login page", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-  it("updates global variable on login success", async () => {
+  it("updates global variable on login success", async () => { //TODO add tests for failure resolution
     (axios.post as unknown as Mock).mockResolvedValueOnce({
       status: 200,
     });
@@ -27,17 +27,17 @@ describe("Login page", () => {
       </Provider>
     );
 
-    const emailSpan = screen.getByTestId(EMailSpanTestID);
+    const emailSpan = screen.getByTestId(LoginEMailSpanTestID);
     const testMail = "alice@example.com";
     emailSpan.textContent = testMail;
     fireEvent.input(emailSpan, { target: { textContent: testMail } });
 
-    const passwordSpan = screen.getByTestId(PasswdSpanTestID);
+    const passwordSpan = screen.getByTestId(LoginPasswdSpanTestID);
     const testPassword = "correct";
     passwordSpan.textContent = testPassword;
     fireEvent.input(passwordSpan, { target: { textContent: testPassword } });
 
-    const submitBtn = screen.getByTestId(SubmitTestID);
+    const submitBtn = screen.getByTestId(LoginSubmitTestID);
     fireEvent.click(submitBtn);
 
     await waitFor(async () => {

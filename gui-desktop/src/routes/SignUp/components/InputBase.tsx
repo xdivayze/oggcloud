@@ -1,12 +1,12 @@
 import { useDispatch } from "react-redux";
-import {
-  EMailSpanTestID,
-  PasswdSpanTestID,
-} from "../../Login/Components/ButtonBody";
+
 import GenericBar, { DefaultContenteditableSpan } from "./GenericBar";
 import { setEMail, setPassword, setPasswordRepeat } from "../signUpSlice";
 
-export const passwordRepeatTestID = "editable-password-repeat-span";
+export const SignUpPasswordRepeatTestID = "editable-password-repeat-span";
+
+export const SignUpEMailSpanTestID = "sign-up-editable-email-span";
+export const SignUpPasswdSpanTestID = "sign-up-editable-password-span";
 
 export default function InputBase() {
   return (
@@ -31,7 +31,7 @@ function EmailCol() {
       <div className="w-full  h-[119px] p-2">
         <GenericBar color="bg-blue-ogg-1">
           <DefaultContenteditableSpan
-            testID={EMailSpanTestID}
+            testID={SignUpEMailSpanTestID}
             defaultText="Enter E-Mail"
             onInput={(t) => dispatch(setEMail(t))}
           />
@@ -39,7 +39,8 @@ function EmailCol() {
       </div>
       <div className="w-full h-[119px] p-2">
         <GenericBar color="bg-blue-ogg-1">
-          <span>Verify E-Mail</span> {/* TODO implement with a button control that spawns another generic bar used to input the verification code */}
+          <span>Verify E-Mail</span>{" "}
+          {/* TODO implement with a button control that spawns another generic bar used to input the verification code */}
         </GenericBar>
       </div>
     </div>
@@ -53,7 +54,7 @@ function PasswordCol() {
       <div className="w-full h-[119px] p-2">
         <GenericBar color="bg-blue-ogg-1">
           <DefaultContenteditableSpan
-            testID={PasswdSpanTestID}
+            testID={SignUpPasswdSpanTestID}
             defaultText="Enter password."
             onInput={(t) => dispatch(setPassword(t))}
           />
@@ -62,7 +63,7 @@ function PasswordCol() {
       <div className="w-full  h-[119px] p-2">
         <GenericBar color="bg-blue-ogg-1">
           <DefaultContenteditableSpan
-            testID={passwordRepeatTestID}
+            testID={SignUpPasswordRepeatTestID}
             defaultText="Re-enter your password."
             onInput={(t) => dispatch(setPasswordRepeat(t))}
           />

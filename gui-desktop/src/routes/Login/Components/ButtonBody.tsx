@@ -4,8 +4,8 @@ import GenericBar, {
 } from "../../SignUp/components/GenericBar";
 import { setEMail, setPassword } from "../loginSlice";
 
-export const PasswdSpanTestID = "editable-passwd-span";
-export const EMailSpanTestID = "editable-email-span";
+export const LoginPasswdSpanTestID = "login-editable-passwd-span";
+export const LoginEMailSpanTestID = "login-editable-email-span";
 
 export default function ButtonBody() {
   const dispatch = useDispatch();
@@ -18,7 +18,7 @@ export default function ButtonBody() {
         <div className="w-full h-[119px] p-2">
           <GenericBar color="bg-blue-ogg-1">
             <DefaultContenteditableSpan
-              testID={EMailSpanTestID}
+              testID={LoginEMailSpanTestID}
               defaultText="Enter E-Mail"
               onInput={(t) => dispatch(setEMail(t))}
             />
@@ -29,7 +29,7 @@ export default function ButtonBody() {
         <div className="w-full h-[119px] p-2">
           <GenericBar color="bg-blue-ogg-1">
             <DefaultContenteditableSpan
-              testID={PasswdSpanTestID}
+              testID={LoginPasswdSpanTestID}
               defaultText="Enter Password"
               onInput={(t) => dispatch(setPassword(t))}
             />
