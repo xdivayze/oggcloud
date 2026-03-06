@@ -5,6 +5,9 @@ import { Library } from "./routes/Library/Library";
 import { Login } from "./routes/Login/Login";
 import AuthWrapper from "./app/AuthWrapper";
 
+//TODO add homepage
+//TODO add about page
+
 export default function App() {
   return (
     <Routes>

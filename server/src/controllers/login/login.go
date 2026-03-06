@@ -37,7 +37,7 @@ func HandleLogin(c *gin.Context) {
 		}
 		return
 	}
-//! fix body.PasswordHash conversion. It needs to be converted from Base64Url to byte stream before processing
+//! fix body.PasswordHash conversion. It needs to be converted from Base64 to byte stream before processing
 	
 	if err := bcrypt.CompareHashAndPassword([]byte(foundUser.BCryptPassword), []byte(body.PasswordHash)); err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {

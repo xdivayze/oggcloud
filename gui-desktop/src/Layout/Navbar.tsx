@@ -21,7 +21,7 @@ export default function Navbar() {
       }} onMouseLeave={() => {
         dispatch(setIsCollapsed(true))
       }
-      } className={` cursor-pointer w-full lg:text-2xl md:text-lg  font-roboto_slab  
+      } className={` cursor-pointer w-full text-md lg:text-2xl md:text-lg    font-roboto_slab  
       text-yellow-ogg-0 text-center transition-all duration-300 ease-in-out flex flex-row 
       ${!isCollapsed ? "h-full scale-100" : "h-2 scale-95"}`}>
         <div className="flex relative w-full h-full">

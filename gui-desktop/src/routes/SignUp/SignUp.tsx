@@ -9,6 +9,9 @@ import { sendSignUpRequest } from "./implementation";
 export const SignUpErrorMessageTestID = "sign-up-error-message-test-id"
 export const SignUpSubmitBtnTestID = "sign-up-submit-btn-test-id"
 
+
+//TODO center navbar 
+
 export default function SignUp() {
   const isCollapsed = useSelector(
     (state: RootState) => state.navbar.isCollapsed

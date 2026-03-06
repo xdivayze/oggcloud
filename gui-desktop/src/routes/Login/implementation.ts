@@ -9,9 +9,15 @@ export interface ILoginRequest {
     passwordHash: string,
 }
 
+function computeAndReturnBase64Hash(passwordPlain: string): string {
+    const passwordHashBytes = sha256 (utf8ToBytes(passwordPlain))
+    const passwordHashB64 = Buffer.from(passwordHashBytes).toString("base64");
+    return passwordHashB64;
+}
+
 
 export async function sendLoginRequest(eMail: string, passwordPlain: string) { //input plain text password and hash later
-    const passwordHash = btoa(String.fromCharCode( ...sha256 (utf8ToBytes(passwordPlain)))) //encode as base64
+    const passwordHash = computeAndReturnBase64Hash(passwordPlain);
     const body: ILoginRequest = {
         eMail,
         passwordHash,

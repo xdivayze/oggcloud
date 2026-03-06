@@ -9,7 +9,8 @@ export default function AuthWrapper() {
 
   try {
     if (email === "") {
-      throw "user not logged in"
+      console.error("user not logged in")
+      // throw "user not logged in"
     }
   } catch (e) {
     setTimeout(() => {
