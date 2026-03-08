@@ -1,9 +1,9 @@
 import {
-  LibraryObjOpenable,
+  LibraryObjParent,
   type LibraryObjConstructorOptions,
 } from "./libraryObj";
 
-class Folder extends LibraryObjOpenable {
+class Folder extends LibraryObjParent {
   open(): void {
     //TODO
     throw new Error("Method not implemented.");

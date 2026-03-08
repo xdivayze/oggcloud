@@ -48,14 +48,13 @@ abstract class LibraryObjOpenable
   extends LibraryObj
   implements LibraryObjOpener
 {
-  open(): void {
-    throw new Error("Abstract class called, open() method implemented in JSX suitable functions");
-  }
+  abstract open(): void;
   constructor(options?: LibraryObjConstructorOptions) {
     super(options);
   }
 }
 
+//parent objects must be able to display their children when requested
 abstract class LibraryObjParent extends LibraryObjOpenable {
   getSpecificFromID(id: number): undefined | LibraryObj {
     //return the object with the specific id, 0 is reserved for self

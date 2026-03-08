@@ -1,10 +1,11 @@
-import {
-  LibraryObjParent,
-  type LibraryObjConstructorOptions,
-} from "./libraryObj";
+import { Folder } from "./folder";
+import { type LibraryObjConstructorOptions } from "./libraryObj";
 
-class Library extends LibraryObjParent {
+//library acts as the root folder with id = 0
+class Library extends Folder {
   constructor(options?: LibraryObjConstructorOptions) {
+    options = options ? options : {};
+    options.id = 0;
     super(options);
   }
 }
