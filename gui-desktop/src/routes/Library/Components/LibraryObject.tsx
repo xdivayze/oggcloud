@@ -1,9 +1,9 @@
-import type { LibraryObjOpenable } from "../models/libraryObj";
+import { LibraryObjOpenable, type LibraryObj } from "../models/libraryObj";
 
 export default function LibraryObject({
   libraryObj,
 }: {
-  libraryObj: LibraryObjOpenable;
+  libraryObj: LibraryObj;
 }) {
   return (
     <div className="w-full h-full">
@@ -11,7 +11,9 @@ export default function LibraryObject({
         src={libraryObj.splashUrl}
         alt={libraryObj.altText}
         onClick={() => {
-          "open" in libraryObj ? libraryObj.open() : () => {};
+          libraryObj instanceof LibraryObjOpenable
+            ? libraryObj.open()
+            : () => {};
         }}
       />
     </div>
