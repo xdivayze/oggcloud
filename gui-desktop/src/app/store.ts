@@ -3,6 +3,7 @@ import navbarReducer from "../Layout/navbarSlice";
 import authReducer from "./authSlice";
 import loginReducer from "../routes/Login/loginSlice";
 import signUpReducer from "../routes/SignUp/signUpSlice";
+import libraryReducer from "../routes/Library/librarySlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     auth: authReducer,
     login: loginReducer,
     sign_up: signUpReducer,
+    library: libraryReducer,
   }
 })
 

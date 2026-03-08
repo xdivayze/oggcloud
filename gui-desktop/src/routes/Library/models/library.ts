@@ -1,14 +1,12 @@
-import type { LibraryObj } from "./libraryObj";
+import {
+  LibraryObjParent,
+  type LibraryObjConstructorOptions,
+} from "./libraryObj";
 
-class Library {
-  children: Array<LibraryObj>;
-
-  getSpecificFromID(id: number): Error | void {}
-
-  deleteSpecific(obj: LibraryObj): Error | void {
-  }
-
-  constructor() {
-    this.children = [];
+class Library extends LibraryObjParent {
+  constructor(options?: LibraryObjConstructorOptions) {
+    super(options);
   }
 }
+
+export { Library };
