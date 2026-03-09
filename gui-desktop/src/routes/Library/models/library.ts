@@ -6,6 +6,7 @@ class Library extends Folder {
   constructor(options?: LibraryObjConstructorOptions) {
     options = options ? options : {};
     options.id = 0;
+    options.parentID = 0; //self referential
     super(options);
   }
 }

@@ -1,3 +1,5 @@
+import { RAW_SPLASH_URL } from "./raw";
+
 type LibraryObjectType = "picture" | "video" | "raw" | "folder" | "na";
 
 interface LibraryObjConstructorOptions {
@@ -6,29 +8,35 @@ interface LibraryObjConstructorOptions {
   id?: number;
   splashUrl?: string;
   realSizeKB?: number;
+  parentID?: number;
+  name?: string;
 }
 
 abstract class LibraryObj {
-  altText: string;
-  type: LibraryObjectType;
+  readonly parentID: number;
   readonly id: number;
-  splashUrl: string;
+  readonly splashUrl: string;
+  readonly type: LibraryObjectType;
+  name: string;
+  altText: string;
   realSizeKB: number;
   children: Array<LibraryObj>;
 
-  //this setter function ignores unitialized and root sets
+  //this setter function ignores the root folder if it is passed
   setChildren(children: Array<LibraryObj>) {
-    this.children = children.filter((v) => v.id > 0);
+    this.children = children.filter((v) => v.id != 0);
   }
 
   constructor(options?: LibraryObjConstructorOptions) {
     options = options ? options : {};
     const {
+      name = "n/A",
       altText = "n/A",
       type = "na",
       id = -1,
-      splashUrl = "/libraryObjectSplashFallback.svg",
+      splashUrl = RAW_SPLASH_URL,
       realSizeKB = 0,
+      parentID = -1,
     } = options;
 
     this.altText = altText;
@@ -37,6 +45,8 @@ abstract class LibraryObj {
     this.splashUrl = splashUrl;
     this.realSizeKB = realSizeKB;
     this.children = [];
+    this.parentID = parentID;
+    this.name = name;
   }
 }
 
@@ -59,7 +69,7 @@ abstract class LibraryObjParent extends LibraryObjOpenable {
   getSpecificFromID(id: number): undefined | LibraryObj {
     //return the object with the specific id, 0 is reserved for self
     if ((id = 0)) return this;
-    return this.children.find((v) => (v.id == id));
+    return this.children.find((v) => v.id == id);
   }
 
   deleteSpecific(obj: LibraryObj): void {

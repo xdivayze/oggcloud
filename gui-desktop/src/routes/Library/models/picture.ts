@@ -1,26 +1,22 @@
 import {
-  LibraryObjParent,
+  LibraryObjOpenable,
   type LibraryObjConstructorOptions,
 } from "./libraryObj";
 
-export const LIBRARY_SPLASH_URL = "/libraryObjectFolderSplash.svg";
-
-class Folder extends LibraryObjParent {
+class Picture extends LibraryObjOpenable {
   open(): void {
     //TODO
     throw new Error("Method not implemented.");
   }
-
   constructor(options?: LibraryObjConstructorOptions) {
-
     if (!options) {
       options = {};
     }
-    options.type = "folder";
-    options.splashUrl = LIBRARY_SPLASH_URL;
+
+    options.type = "picture";
 
     super(options);
   }
 }
 
-export { Folder };
+export { Picture };
