@@ -4,7 +4,7 @@ import {
 } from "./libraryObj";
 
 class Video extends LibraryObjOpenable {
-  open(): void {
+  open(): void { //TODO
     throw new Error("Method not implemented.");
   }
 

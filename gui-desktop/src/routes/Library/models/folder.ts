@@ -1,4 +1,7 @@
+import { folderFetchChildren } from "../services/folderFetchChildren";
+import { libraryObjectFactory } from "../services/libraryObjectFactory";
 import {
+  LibraryObj,
   LibraryObjParent,
   type LibraryObjConstructorOptions,
 } from "./libraryObj";
@@ -11,15 +14,25 @@ class Folder extends LibraryObjParent {
     throw new Error("Method not implemented.");
   }
 
-  constructor(options?: LibraryObjConstructorOptions) {
+  async populateChildrenArr(): Promise<void> {
+    const children = await folderFetchChildren(this.getID());
+    let childrenObjArr: Array<LibraryObj> = [];
+    children.forEach((v) => {
+      childrenObjArr.push(libraryObjectFactory(v));
+    });
+  }
 
+  constructor(
+    children?: Array<LibraryObj>,
+    options?: LibraryObjConstructorOptions,
+  ) {
     if (!options) {
       options = {};
     }
     options.type = "folder";
     options.splashUrl = LIBRARY_SPLASH_URL;
 
-    super(options);
+    super(children, options);
   }
 }
 
