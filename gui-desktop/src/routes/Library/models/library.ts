@@ -7,7 +7,7 @@ class Library extends Folder {
     options = options ? options : {};
     options.id = 0;
     options.parentID = 0; //self referential
-    super(options);
+    super([],options);
   }
 }
 
