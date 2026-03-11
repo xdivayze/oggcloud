@@ -1,0 +1,2 @@
+svg icons are extracted from
+https://www.svgrepo.com/collection/atomicons-interface-line-icons
