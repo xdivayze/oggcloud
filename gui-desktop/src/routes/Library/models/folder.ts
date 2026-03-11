@@ -1,12 +1,12 @@
 import { folderFetchChildren } from "../services/folderFetchChildren";
 import { libraryObjectFactory } from "../services/libraryObjectFactory";
+import { FOLDER_SPLASH_URL } from "./constants";
 import {
   LibraryObj,
   LibraryObjParent,
   type LibraryObjConstructorOptions,
 } from "./libraryObj";
 
-export const LIBRARY_SPLASH_URL = "/libraryObjectFolderSplash.svg";
 
 class Folder extends LibraryObjParent {
   open(): void {
@@ -20,6 +20,11 @@ class Folder extends LibraryObjParent {
     children.forEach((v) => {
       childrenObjArr.push(libraryObjectFactory(v));
     });
+    this.setChildren(childrenObjArr);
+  }
+
+  setSplashUrl(_splashUrl: string): void {
+    this.splashUrl = FOLDER_SPLASH_URL;
   }
 
   constructor(
@@ -30,7 +35,7 @@ class Folder extends LibraryObjParent {
       options = {};
     }
     options.type = "folder";
-    options.splashUrl = LIBRARY_SPLASH_URL;
+    options.splashUrl = FOLDER_SPLASH_URL;
 
     super(children, options);
   }

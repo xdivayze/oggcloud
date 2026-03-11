@@ -1,5 +1,5 @@
 import { fetchSelfFromID } from "../services/fetchSelfFromID";
-import { RAW_SPLASH_URL } from "./raw";
+import {  RAW_SPLASH_URL } from "./constants";
 
 type LibraryObjectType = "picture" | "video" | "raw" | "folder" | "na";
 
@@ -14,13 +14,21 @@ interface LibraryObjConstructorOptions {
 }
 
 abstract class LibraryObj {
-  protected parentID: number;
+  private parentID: number;
   private id: number;
-  splashUrl: string;
+  protected splashUrl: string;
   readonly type: LibraryObjectType;
   name: string;
   altText: string;
   realSizeKB: number;
+
+  setSplashUrl(splashUrl: string) {
+    this.splashUrl = splashUrl;
+  }
+
+  getSplashUrl() {
+    return this.splashUrl;
+  }
 
   getParentID(): number {
     return this.parentID;
@@ -54,7 +62,7 @@ abstract class LibraryObj {
     this.name = self.name;
     this.parentID = self.parentID;
     this.realSizeKB = self.realSizeKB;
-    this.splashUrl = self.splashUrl;
+    this.setSplashUrl(this.splashUrl);
   }
 
   constructor(options?: LibraryObjConstructorOptions) {

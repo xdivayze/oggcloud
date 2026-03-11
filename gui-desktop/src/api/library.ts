@@ -1,2 +1,2 @@
-export const fetchChildrenEndpoint = "/api/secure/library/fetch-children"
-export const fetchSelfEndpoint = "/api/secure/library/fetch-self"
+export const FETCH_CHILDREN_ENDPOINT = "/api/secure/library/fetch-children"
+export const FETCH_SELF_ENDPOINT = "/api/secure/library/fetch-self"

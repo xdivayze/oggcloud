@@ -1,13 +1,13 @@
 import axios from "axios";
-import { fetchChildrenEndpoint } from "../../../api/library";
+import { FETCH_CHILDREN_ENDPOINT } from "../../../api/library";
 import type { LibraryObjectType } from "../models/libraryObj";
 
-interface FolderFetchResponseBody {
+export interface FolderFetchResponseBody {
   children: Array<{ id: number; type: LibraryObjectType }>;
 }
 
 export function folderFetchChildren(id: number) {
-  const response = axios.get<FolderFetchResponseBody>(fetchChildrenEndpoint, {
+  const response = axios.get<FolderFetchResponseBody>(FETCH_CHILDREN_ENDPOINT, {
     params: {
       id,
     },

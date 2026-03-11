@@ -1,14 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { Library } from "./models/library";
 
 interface LibrarySlice {
   effectivePath: number; //id of the folder in the library
-  library: Library
+  shownChildrenIDs: Array<number>; //TODO i forgot why I had this field
 }
 
 const initialState: LibrarySlice = {
   effectivePath: 0,
-  library: new Library(),
+  shownChildrenIDs: [],
 };
 
 const librarySlice = createSlice({
@@ -19,11 +18,11 @@ const librarySlice = createSlice({
       state.effectivePath = action.payload;
     },
     setLibrary: (state, action) => {
-        state.library = action.payload;
+      state.shownChildrenIDs = action.payload;
     },
   },
 });
 
-const libraryReducer = librarySlice.reducer
-export default libraryReducer
-export const {setEffectivePath, setLibrary} = librarySlice.actions
+const libraryReducer = librarySlice.reducer;
+export default libraryReducer;
+export const { setEffectivePath, setLibrary } = librarySlice.actions;

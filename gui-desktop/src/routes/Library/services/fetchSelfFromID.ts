@@ -1,5 +1,5 @@
 import axios from "axios";
-import { fetchSelfEndpoint } from "../../../api/library";
+import { FETCH_SELF_ENDPOINT } from "../../../api/library";
 import type { LibraryObjConstructorOptions, LibraryObjectType } from "../models/libraryObj";
 
 export interface LibraryObjectDescriptor extends LibraryObjConstructorOptions {
@@ -14,7 +14,7 @@ export interface LibraryObjectDescriptor extends LibraryObjConstructorOptions {
 
 export function fetchSelfFromID(id: number) {
   return axios
-    .get<LibraryObjectDescriptor>(fetchSelfEndpoint, {
+    .get<LibraryObjectDescriptor>(FETCH_SELF_ENDPOINT, {
       params: {
         id,
       },

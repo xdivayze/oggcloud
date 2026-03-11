@@ -3,14 +3,16 @@ import type { RootState } from "./store";
 import { Outlet, useNavigate } from "react-router-dom";
 
 export default function AuthWrapper() {
-  const email = useSelector((state: RootState) => state.auth.eMail)
+  const email = useSelector((state: RootState) => state.auth.eMail);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   try {
     if (email === "") {
-      console.error("user not logged in")
-      // throw "user not logged in"
+      console.warn("user not logged in, development mode auth bypass"); // bypassed due to development purposes
+      if (import.meta.env.PROD) {
+        throw new Error("user not logged in");
+      }
     }
   } catch (e) {
     setTimeout(() => {
@@ -31,5 +33,5 @@ export default function AuthWrapper() {
       </div>
     );
   }
-  return <Outlet />
+  return <Outlet />;
 }

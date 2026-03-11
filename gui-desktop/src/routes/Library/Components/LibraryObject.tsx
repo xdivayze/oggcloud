@@ -6,9 +6,9 @@ export default function LibraryObject({
   libraryObj: LibraryObj;
 }) {
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full bg-gray-800 rounded-2xl p-3 border-solid border-1 border-indigo-ogg-0 shadow-lg">
       <img
-        src={libraryObj.splashUrl}
+        src={libraryObj.getSplashUrl()}
         alt={libraryObj.altText}
         onClick={() => {
           libraryObj instanceof LibraryObjOpenable
@@ -16,6 +16,7 @@ export default function LibraryObject({
             : () => {};
         }}
       />
+      <div className="font-roboto_slab  text-gray-100 text-center text-[10px]">{libraryObj.name}</div>
     </div>
   );
 }
