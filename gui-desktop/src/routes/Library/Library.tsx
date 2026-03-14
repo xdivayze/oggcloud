@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { centerNavbarTitle } from "../../Layout/navbarSlice";
 import { Plus } from "lucide-react";
 import { Library } from "./models/library";
@@ -14,16 +14,23 @@ export const LibraryNavbarObj = {
 export function LibraryComponent() {
   //page where files shared by and to the user can be viewed
   const dispatch = useDispatch();
-  const library = new Library(); //TODO switch to provider
+  
+  const libraryRef = useRef<Library | null>(null);
+  if (libraryRef.current === null) {
+    libraryRef.current = new Library(); //TODO switch to provider
+    libraryRef.current.populateChildrenArr();
+  }
 
-  useEffect(() => {
-    library.populateChildrenArr();
+  useEffect(()=>{
     dispatch(centerNavbarTitle(LibraryNavbarObj));
-  }, []);
+  }, [])
+
+  const library = libraryRef.current;
 
   const isCollapsed = useSelector(
     (state: RootState) => state.navbar.isCollapsed,
   );
+  
   return (
     <div
       className={`w-full h-full pb-2 px-2 duration-100 transform-all ease-linear ${isCollapsed ? "pt-3" : "pt-7"} `}

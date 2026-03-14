@@ -7,11 +7,11 @@ import {
   type LibraryObjConstructorOptions,
 } from "./libraryObj";
 
-
 class Folder extends LibraryObjParent {
-  open(): void {
-    //TODO
-    throw new Error("Method not implemented.");
+  open(callback: (data: Record<string, unknown>) => void): void {
+    callback({
+      id: this.getID(),
+    });
   }
 
   async populateChildrenArr(): Promise<void> {

@@ -1,5 +1,5 @@
 import { fetchSelfFromID } from "../services/fetchSelfFromID";
-import {  RAW_SPLASH_URL } from "./constants";
+import { RAW_SPLASH_URL } from "./constants";
 
 type LibraryObjectType = "picture" | "video" | "raw" | "folder" | "na";
 
@@ -88,14 +88,14 @@ abstract class LibraryObj {
 }
 
 export interface LibraryObjOpener {
-  open(): void;
+  open(callback: (data: Record<string, unknown>) => void): void;
 }
 
 abstract class LibraryObjOpenable
   extends LibraryObj
   implements LibraryObjOpener
 {
-  abstract open(): void;
+  abstract open(callback: (data: Record<string, unknown>) => void): void;
   constructor(options?: LibraryObjConstructorOptions) {
     super(options);
   }
@@ -108,10 +108,14 @@ abstract class LibraryObjParent extends LibraryObjOpenable {
   //this setter function ignores the root folder if it is passed
   setChildren(children: Array<LibraryObj>) {
     this.children = children.filter((v) => v.getID() != 0);
+    this.children.push(this)
+  }
+  addChildren(children: Array<LibraryObj>) {
+    this.children.push(...children.filter((v) => v.getID() != 0));
   }
   getSpecificFromID(id: number): undefined | LibraryObj {
     //return the object with the specific id, 0 is reserved for self
-    if ((id = 0)) return this;
+    if (id === 0) return this;
     return this.children.find((v) => v.getID() == id);
   }
 

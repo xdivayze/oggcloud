@@ -16,9 +16,12 @@ export function Shelf({ library }: { library: Library }) {
   const [fetching, setFetching] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
     async function loadShelf() {
       const parent = library.getSpecificFromID(effectivePath);
+
       if (!parent) {
+        console.log(library.children);
         throw new Error("opened path does not exist");
       }
       if (!(parent instanceof Folder)) {
@@ -27,6 +30,7 @@ export function Shelf({ library }: { library: Library }) {
 
       setFetching(true);
       await parent.populateChildrenArr();
+
       const children = parent.children.filter((v) => v.getID() !== 0);
       await Promise.all(
         children.map((v) =>
@@ -35,7 +39,8 @@ export function Shelf({ library }: { library: Library }) {
           }),
         ),
       );
-      setShelfItems([...children]);
+      setShelfItems([...children.filter((v) => v.getID() != effectivePath)]);
+
       setFetching(false);
     }
 
@@ -43,6 +48,10 @@ export function Shelf({ library }: { library: Library }) {
       console.error(e);
       setFetching(false);
     });
+
+    return () => {
+      cancelled = true;
+    };
   }, [effectivePath]);
 
   return (
@@ -50,12 +59,8 @@ export function Shelf({ library }: { library: Library }) {
       {!fetching &&
         shelfItems.map((v) => {
           return (
-            <div
-              className=" w-25 m-2 "
-              key={v.getID()}
-              id={String(v.getID())}
-            >
-                <LibraryObject libraryObj={v} />
+            <div className=" w-25 m-2 " key={v.getID()} id={String(v.getID())}>
+              <LibraryObject libraryObj={v} />
             </div>
           );
         })}
