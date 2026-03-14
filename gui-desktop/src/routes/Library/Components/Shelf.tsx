@@ -21,7 +21,6 @@ export function Shelf({ library }: { library: Library }) {
       const parent = library.getSpecificFromID(effectivePath);
 
       if (!parent) {
-        console.log(library.children);
         throw new Error("opened path does not exist");
       }
       if (!(parent instanceof Folder)) {
@@ -39,6 +38,7 @@ export function Shelf({ library }: { library: Library }) {
           }),
         ),
       );
+      //TODO add go to parent directory
       setShelfItems([...children.filter((v) => v.getID() != effectivePath)]);
 
       setFetching(false);

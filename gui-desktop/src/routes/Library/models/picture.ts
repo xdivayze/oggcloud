@@ -1,3 +1,4 @@
+import { PICTURE_DEFAULT_SPLASH_URL } from "./constants";
 import {
   LibraryObjOpenable,
   type LibraryObjConstructorOptions,
@@ -14,6 +15,7 @@ class Picture extends LibraryObjOpenable {
     }
 
     options.type = "picture";
+    if (!options.splashUrl) options.splashUrl = PICTURE_DEFAULT_SPLASH_URL;
 
     super(options);
   }
