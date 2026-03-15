@@ -108,7 +108,7 @@ abstract class LibraryObjParent extends LibraryObjOpenable {
   //this setter function ignores the root folder if it is passed
   setChildren(children: Array<LibraryObj>) {
     this.children = children.filter((v) => v.getID() != 0);
-    this.children.push(this)
+    this.children.push(this);
   }
   addChildren(children: Array<LibraryObj>) {
     this.children.push(...children.filter((v) => v.getID() != 0));

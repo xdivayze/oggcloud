@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import type { RootState } from "../../../app/store";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { type LibraryObj } from "../models/libraryObj";
 import LibraryObject from "./LibraryObject";
 import type { Library } from "../models/library";
 import { Folder } from "../models/folder";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { setEffectivePath } from "../librarySlice";
+import { LibraryNavbarObj } from "../Library";
 
 //displays the items in the effective path of the library
 export function Shelf({ library }: { library: Library }) {
@@ -15,13 +18,27 @@ export function Shelf({ library }: { library: Library }) {
   const [shelfItems, setShelfItems] = useState<Array<LibraryObj>>([]);
   const [fetching, setFetching] = useState(false);
 
+  const [searchParams] = useSearchParams();
+  let pathParam = Number(searchParams.get("path"));
+  pathParam = pathParam === null ? 0 : pathParam;
+  const path = Number.isNaN(pathParam) ? 0 : pathParam;
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(setEffectivePath(path));
+  }, [dispatch, path]);
+
   useEffect(() => {
     let cancelled = false;
-    async function loadShelf() {
-      const parent = library.getSpecificFromID(effectivePath);
 
+    async function loadShelf() {
+      const parent = library.getSpecificFromID(effectivePath); //TODO add fallback and fetch from server
       if (!parent) {
-        throw new Error("opened path does not exist");
+        console.error("opened path does not exist");
+        navigate(LibraryNavbarObj.navigateTo);
+        return;
       }
       if (!(parent instanceof Folder)) {
         throw new Error("effective path is not a parent object");

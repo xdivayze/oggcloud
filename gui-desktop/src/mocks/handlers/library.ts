@@ -5,10 +5,6 @@ import {
 } from "../../api/library";
 import type { FolderFetchResponseBody } from "../../routes/Library/services/folderFetchChildren";
 import type { LibraryObjectDescriptor } from "../../routes/Library/services/fetchSelfFromID";
-import type {
-  LibraryObj,
-  LibraryObjectType,
-} from "../../routes/Library/models/libraryObj";
 const data: Array<LibraryObjectDescriptor> = [
   {
     id: 1,

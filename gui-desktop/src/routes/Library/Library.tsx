@@ -11,13 +11,13 @@ export const LibraryNavbarObj = {
   navigateTo: "/secure/library",
 };
 
-export function LibraryComponent() {
+export function LibraryComponent() { //TODO add navigation bar that shows the current path tree
   //page where files shared by and to the user can be viewed
   const dispatch = useDispatch();
   
   const libraryRef = useRef<Library | null>(null);
   if (libraryRef.current === null) {
-    libraryRef.current = new Library(); //TODO switch to provider
+    libraryRef.current = new Library(); 
     libraryRef.current.populateChildrenArr();
   }
 
