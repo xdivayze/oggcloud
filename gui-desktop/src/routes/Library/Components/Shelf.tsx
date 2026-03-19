@@ -34,10 +34,10 @@ export function Shelf({ library }: { library: Library }) {
     let cancelled = false;
 
     async function loadShelf() {
-      const parent = library.getSpecificFromID(effectivePath); //TODO add fallback and fetch from server
+      const parent = library.getSpecificFromID(effectivePath); //TODO add fallback and fetch tree from server
       if (!parent) {
         console.error("opened path does not exist");
-        navigate(LibraryNavbarObj.navigateTo);
+        navigate(LibraryNavbarObj.navigateTo); //current fallback to root path if the file tree hasn't reached the target
         return;
       }
       if (!(parent instanceof Folder)) {
@@ -46,6 +46,7 @@ export function Shelf({ library }: { library: Library }) {
 
       setFetching(true);
       await parent.populateChildrenArr();
+      if (cancelled) throw new Error("cancelled");
 
       const children = parent.children.filter((v) => v.getID() !== 0);
       await Promise.all(

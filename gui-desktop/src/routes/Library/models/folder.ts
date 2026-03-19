@@ -27,6 +27,8 @@ class Folder extends LibraryObjParent {
     this.splashUrl = FOLDER_SPLASH_URL;
   }
 
+  
+
   constructor(
     children?: Array<LibraryObj>,
     options?: LibraryObjConstructorOptions,

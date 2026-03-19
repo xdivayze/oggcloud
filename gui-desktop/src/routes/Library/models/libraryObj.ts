@@ -42,6 +42,11 @@ abstract class LibraryObj {
     return this.id;
   }
 
+  generateFamilyTree() {
+    //TODO implement
+    //TODO add unit tests
+  }
+
   async instantiateSelfFromID(): Promise<void> {
     if (this.id === -1)
       throw new Error(
@@ -57,10 +62,13 @@ abstract class LibraryObj {
       throw new Error(
         "type mismatch in fetched self and current object, exiting...",
       );
+    if (self.parentID !== this.parentID)
+      throw new Error(
+        "parent mismatch in fetched self and current object, exiting...",
+      );
 
     this.altText = self.altText;
     this.name = self.name;
-    this.parentID = self.parentID;
     this.realSizeKB = self.realSizeKB;
     this.setSplashUrl(this.splashUrl);
   }
@@ -110,8 +118,15 @@ abstract class LibraryObjParent extends LibraryObjOpenable {
     this.children = children.filter((v) => v.getID() != 0);
     this.children.push(this);
   }
-  addChildren(children: Array<LibraryObj>) {
-    this.children.push(...children.filter((v) => v.getID() != 0));
+
+  addChildrenUnique(children: Array<LibraryObj>) {
+    this.children.push(
+      ...children.filter((v) => {
+        if (v.getID() == 0) return false;
+        if (this.getSpecificFromID(v.getID())) return false; //push if child doesn't exist
+        return true;
+      }),
+    );
   }
   getSpecificFromID(id: number): undefined | LibraryObj {
     //return the object with the specific id, 0 is reserved for self
