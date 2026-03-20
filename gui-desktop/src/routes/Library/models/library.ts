@@ -1,4 +1,3 @@
-import { libraryObjectFactory } from "../services/libraryObjectFactory";
 import { Folder } from "./folder";
 import {
   LibraryObj,

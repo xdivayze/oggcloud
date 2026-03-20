@@ -4,9 +4,8 @@ import type { Library } from "../models/library";
 import { useEffect, useState } from "react";
 import { fetchFamilyTree } from "../services/fetchFamilyTree";
 import type { LibraryObj } from "../models/libraryObj";
-import { Folder } from "../models/folder";
 
-export default function DidrectoryNavigator({ library }: { library: Library }) {
+export default function DirectoryNavigator({ library }: { library: Library }) {
   const effectivePath = useSelector(
     (state: RootState) => state.library.effectivePath,
   );

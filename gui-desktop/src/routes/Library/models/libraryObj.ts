@@ -42,11 +42,6 @@ abstract class LibraryObj {
     return this.id;
   }
 
-  generateFamilyTree() {
-    //TODO implement
-    //TODO add unit tests
-  }
-
   async instantiateSelfFromID(): Promise<void> {
     if (this.id === -1)
       throw new Error(
