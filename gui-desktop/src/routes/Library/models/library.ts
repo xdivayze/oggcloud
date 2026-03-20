@@ -20,7 +20,7 @@ class Library extends Folder {
     for (let i = 0; i < tree.length; i++) {
       const found = this.getSpecificFromFamilyTree(
         //retrieves the ith element from the last
-        tree.splice(0, tree.length - i),
+        tree.slice(0, tree.length - i),
       );
       if (!found)
         throw new Error(
@@ -28,6 +28,7 @@ class Library extends Folder {
         );
       objs.push(found);
     }
+    objs.reverse();
 
     return objs; //TODO unit tests
   }
