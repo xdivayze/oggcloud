@@ -12,14 +12,28 @@ class Library extends Folder {
     this.children = children;
   }
 
+  //returns an array of library objects from the id tree
+  //elements must already be inserted into the library
   familyTreeToObjectArray(tree: number[]): LibraryObj[] {
-    //TODO implement
+    let objs = [];
 
-    return []; //TODO unit tests
+    for (let i = 0; i < tree.length; i++) {
+      const found = this.getSpecificFromFamilyTree(
+        //retrieves the ith element from the last
+        tree.splice(0, tree.length - i),
+      );
+      if (!found)
+        throw new Error(
+          "at least one of the elements are not found in the library",
+        );
+      objs.push(found);
+    }
+
+    return objs; //TODO unit tests
   }
 
   //everything is inserted and instantiated
-  async insertFamilyTree(tree: Array<number>) {
+  async insertFamilyTreeAndInstantiate(tree: Array<number>) {
     //TODO add unit tests
     if (tree[0] != 0) throw new Error("root object is not the first element"); //return if root is not the first object in the tree
     let lastFound: Folder = this;

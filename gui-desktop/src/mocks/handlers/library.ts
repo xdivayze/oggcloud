@@ -1,6 +1,7 @@
 import { http, HttpResponse } from "msw";
 import {
   FETCH_CHILDREN_ENDPOINT,
+  FETCH_FAMILY_TREE_ENDPOINT,
   FETCH_SELF_ENDPOINT,
 } from "../../api/library";
 import type { FolderFetchResponseBody } from "../../routes/Library/services/folderFetchChildren";
@@ -52,6 +53,15 @@ const data: Array<LibraryObjectDescriptor> = [
 
     altText: "alt",
   },
+  {
+    id: 6,
+    type: "raw",
+    name: "test object",
+    parentID: 4,
+    realSizeKB: 4096,
+    splashUrl: "",
+    altText: "alt",
+  },
 ];
 
 export const libraryHandlers = [
@@ -92,5 +102,39 @@ export const libraryHandlers = [
     if (!found) return HttpResponse.json({}, { status: 404 });
 
     return HttpResponse.json(found, { status: 200 });
+  }),
+  http.get(FETCH_FAMILY_TREE_ENDPOINT, ({ request }) => {
+    const url = new URL(request.url);
+    const idStr = url.searchParams.get("id");
+
+    if (!idStr) {
+      return HttpResponse.json(
+        {},
+        { statusText: "id search parameter missing", status: 400 },
+      );
+    }
+
+    let tree = [];
+    let id = Number(idStr);
+    while (id != 0) {
+      const found = data.find((v) => v.id === id);
+      if (!found) {
+        return HttpResponse.json(
+          {},
+          { statusText: "one of the parents not found", status: 404 },
+        );
+      }
+      tree.push(found.id);
+      id = found.parentID;
+    }
+    tree.push(0)
+    tree.reverse()
+
+    return HttpResponse.json(
+      {
+        tree,
+      },
+      { status: 200 },
+    );
   }),
 ];

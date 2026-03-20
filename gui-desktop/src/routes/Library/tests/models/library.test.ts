@@ -14,4 +14,13 @@ describe("Library", () => {
     expect(foundObj.getID()).toBe(tree[3]);
     expect(foundObj.getParentID()).toBe(tree[2]);
   });
+
+  it("inserts all elements in a family tree and initializes them successfully", async ()=>{
+    const library = new Library();
+    const tree = [0,3,4,6];
+    await library.insertFamilyTreeAndInstantiate(tree)
+    expect(library.getSpecificFromFamilyTree(tree)?.altText).toBe("alt"); 
+    expect(library.getSpecificFromFamilyTree(tree.splice(0, tree.length-1))?.name).toBe("test folder")
+
+  })
 });
