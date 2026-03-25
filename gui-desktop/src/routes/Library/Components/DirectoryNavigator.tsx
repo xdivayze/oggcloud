@@ -39,5 +39,12 @@ export default function DirectoryNavigator({ library }: { library: Library }) {
     };
   }, [effectivePath]);
 
-  return <div className="w-full h-full flex flex-row">{/*navbar here*/}</div>;
+  return (
+    <div className="w-full h-full flex flex-row">
+      {!fetching &&
+        displayedElements.map((v) => {
+          return <div key={v.getID()} className="w-10 h-5">{v.name}</div>;
+        })}
+    </div>
+  );
 }

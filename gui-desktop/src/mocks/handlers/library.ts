@@ -62,6 +62,24 @@ const data: Array<LibraryObjectDescriptor> = [
     splashUrl: "",
     altText: "alt",
   },
+  {
+    id: 7,
+    type: "folder",
+    name: "test folder",
+    parentID: 4,
+    realSizeKB: 2048,
+    altText: "alt",
+    splashUrl: "",
+  },
+  {
+    id: 8,
+    type: "raw",
+    name: "test object",
+    parentID: 7,
+    realSizeKB: 4096,
+    splashUrl: "",
+    altText: "alt",
+  },
 ];
 
 export const libraryHandlers = [
@@ -127,8 +145,8 @@ export const libraryHandlers = [
       tree.push(found.id);
       id = found.parentID;
     }
-    tree.push(0)
-    tree.reverse()
+    tree.push(0);
+    tree.reverse();
 
     return HttpResponse.json(
       {

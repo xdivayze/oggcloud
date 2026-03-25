@@ -17,7 +17,7 @@ describe("Library", () => {
 
   it("inserts all elements in a family tree and initializes them successfully", async () => {
     const library = new Library();
-    const tree = [0, 3, 4, 6];
+    const tree = [0, 3, 4, 7, 8];
     await library.insertFamilyTreeAndInstantiate(tree);
     expect(library.getSpecificFromFamilyTree(tree)?.altText).toBe("alt");
     expect(
@@ -34,6 +34,14 @@ describe("Library", () => {
     for (const v in objArr) {
       expect(v).toBeTruthy();
     }
-    expect(objArr[0].getID()).toBe(0)
+    expect(objArr[0].getID()).toBe(0);
+  });
+
+  it("retrieves specific element from the library using the family tree successfully", async () => {
+    const library = new Library();
+    const tree = [0, 3, 4, 7, 8];
+    await library.insertFamilyTreeAndInstantiate(tree);
+    const obj = library.getSpecificFromFamilyTree(tree);
+    expect(obj).toBeTruthy();
   });
 });

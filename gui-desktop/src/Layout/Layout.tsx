@@ -9,7 +9,7 @@ export default function Layout() {
         <Navbar />
       </div>
       <div className="w-full h-full px-[4rem]">
-
+        
         <Outlet />
       </div>
     </div>

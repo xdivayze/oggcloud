@@ -29,16 +29,22 @@ class Library extends Folder {
     }
     objs.reverse();
 
-    return objs; //TODO unit tests
+    return objs;
   }
+
 
   //everything is inserted and instantiated
   async insertFamilyTreeAndInstantiate(tree: Array<number>) {
-    //TODO add unit tests
     if (tree[0] != 0) throw new Error("root object is not the first element"); //return if root is not the first object in the tree
     let lastFound: Folder = this;
     let instantiationPromises = [];
     for (let i = 1; i < tree.length - 1; i++) {
+      const lastFoundTemp = lastFound.getSpecificFromID(tree[i - 1]);
+      if (!lastFoundTemp || !(lastFoundTemp instanceof Folder))
+        throw new Error(
+          "recently inserted parent object unretrievable or of a different type",
+        );
+      lastFound = lastFoundTemp;
       const newChild = new Folder(undefined, {
         id: tree[i],
         parentID: tree[i - 1],
@@ -46,12 +52,17 @@ class Library extends Folder {
 
       lastFound.addChildrenUnique([newChild]);
       instantiationPromises.push(newChild.instantiateSelfFromID());
-      lastFound = newChild;
     }
     await Promise.all(instantiationPromises);
 
     //last element's instantiation
-    const parent = lastFound;
+    const parentTree = tree.slice(0, tree.length - 1);
+    const parent = this.getSpecificFromFamilyTree(parentTree);
+    if (!parent || !(parent instanceof Folder)) {
+      throw new Error(
+        "recently inserted parent object unretrievable or of a different type",
+      );
+    }
     await parent.populateChildrenArr();
     const foundLastChild = parent.getSpecificFromID(tree[tree.length - 1]);
     if (!foundLastChild)
