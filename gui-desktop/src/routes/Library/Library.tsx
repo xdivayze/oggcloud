@@ -39,7 +39,7 @@ export function LibraryComponent() { //TODO add navigation bar that shows the cu
       {/* <div className="w-full h-7 px-2"> <DirectoryNavigator library={library} /> </div> */}
       <div className="w-full h-full rounded-3xl relative bg-blue-ogg-1 p-5 ">
         <div className="w-full max-h-full  overflow-y-auto overflow-x-hidden ">
-          <Shelf library={library} />
+          <Shelf libraryRef={libraryRef} />  {/*//TODO PASS LIBRARY REF */}
           {/* library data inserted here to keep the + sign floating fixed */}
         </div>
 

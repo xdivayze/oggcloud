@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { RootState } from "../../../app/store";
 import { useDispatch, useSelector } from "react-redux";
 import { type LibraryObj } from "../models/libraryObj";
@@ -11,7 +11,11 @@ import { LibraryNavbarObj } from "../Library";
 import { fetchFamilyTree } from "../services/fetchFamilyTree";
 
 //displays the items in the effective path of the library
-export function Shelf({ library }: { library: Library }) {
+export function Shelf({
+  libraryRef,
+}: {
+  libraryRef: React.RefObject<Library | null>;
+}) {
   const effectivePath = useSelector(
     (state: RootState) => state.library.effectivePath,
   );
@@ -32,22 +36,20 @@ export function Shelf({ library }: { library: Library }) {
   }, [dispatch, path]);
 
   useEffect(() => {
+    const library = libraryRef.current;
     let cancelled = false;
 
     async function loadShelf() {
-      const tree = await fetchFamilyTree(effectivePath);
+      if (!library) throw new Error("library null");
+      const tree = await fetchFamilyTree(path);
       if (!tree) {
-        console.error();
-        throw new Error("opened path does not exist", {
-          cause: "non-existence",
-        });
+        throw new Error("opened path does not exist");
       }
 
-      let parent = library.getSpecificFromFamilyTree(tree); //TODO add fallback and fetch tree from server
+      let parent = library.getSpecificFromFamilyTree(tree);
       if (!parent) {
         await library.insertFamilyTreeAndInstantiate(tree);
         parent = library.getSpecificFromFamilyTree(tree);
-        console.log(parent);
       }
       if (!(parent instanceof Folder)) {
         throw new Error("effective path is not a parent object");
@@ -58,22 +60,16 @@ export function Shelf({ library }: { library: Library }) {
       if (cancelled) throw new Error("cancelled", { cause: "cancel" });
 
       const children = parent.children.filter((v) => v.getID() !== 0);
-      await Promise.all(
-        children.map((v) =>
-          v.instantiateSelfFromID().catch((e) => {
-            console.error(e);
-          }),
-        ),
-      );
+      await Promise.all(children.map((v) => v.instantiateSelfFromID()));
       //TODO add go to parent directory
-      setShelfItems([...children.filter((v) => v.getID() != effectivePath)]);
+      setShelfItems([...children.filter((v) => v.getID() != path)]);
 
       setFetching(false);
     }
 
     loadShelf().catch((e: Error) => {
-      console.error(e);
       if (e.cause !== "cancel") {
+        console.error(e);
         navigate(LibraryNavbarObj.navigateTo); //current fallback to root path if the file tree hasn't reached the target
         return;
       }
@@ -83,7 +79,7 @@ export function Shelf({ library }: { library: Library }) {
     return () => {
       cancelled = true;
     };
-  }, [effectivePath]);
+  }, [path]);
 
   return (
     <div className="w-full h-full p-3 flex flex-row">

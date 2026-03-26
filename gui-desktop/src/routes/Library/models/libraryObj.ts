@@ -114,14 +114,18 @@ abstract class LibraryObjParent extends LibraryObjOpenable {
     this.children.push(this);
   }
 
+  //adds child if it isn't already a child, returns the number of successful insertions
   addChildrenUnique(children: Array<LibraryObj>) {
+    let count = 0;
     this.children.push(
       ...children.filter((v) => {
         if (v.getID() == 0) return false;
         if (this.getSpecificFromID(v.getID())) return false; //push if child doesn't exist
+        count ++
         return true;
       }),
     );
+    return count;
   }
   getSpecificFromID(id: number): undefined | LibraryObj {
     //return the object with the specific id, 0 is reserved for self

@@ -32,10 +32,10 @@ class Library extends Folder {
     return objs;
   }
 
-
   //everything is inserted and instantiated
   async insertFamilyTreeAndInstantiate(tree: Array<number>) {
     if (tree[0] != 0) throw new Error("root object is not the first element"); //return if root is not the first object in the tree
+    if (tree.length === 1) return this;
     let lastFound: Folder = this;
     let instantiationPromises = [];
     for (let i = 1; i < tree.length - 1; i++) {
@@ -50,8 +50,8 @@ class Library extends Folder {
         parentID: tree[i - 1],
       });
 
-      lastFound.addChildrenUnique([newChild]);
-      instantiationPromises.push(newChild.instantiateSelfFromID());
+      if (lastFound.addChildrenUnique([newChild]))
+        instantiationPromises.push(newChild.instantiateSelfFromID());
     }
     await Promise.all(instantiationPromises);
 
