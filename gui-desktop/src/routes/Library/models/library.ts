@@ -17,14 +17,16 @@ class Library extends Folder {
     let objs = [];
 
     for (let i = 0; i < tree.length; i++) {
+      const effTree = tree.slice(0, tree.length - i);
       const found = this.getSpecificFromFamilyTree(
         //retrieves the ith element from the last
-        tree.slice(0, tree.length - i),
+        effTree,
       );
-      if (!found)
+      if (!found) {
         throw new Error(
           "at least one of the elements are not found in the library",
         );
+      }
       objs.push(found);
     }
     objs.reverse();

@@ -12,34 +12,38 @@ export const LibraryNavbarObj = {
   navigateTo: "/secure/library",
 };
 
-export function LibraryComponent() { //TODO add navigation bar that shows the current path tree
+export function LibraryComponent() {
+  //TODO add navigation bar that shows the current path tree
   //page where files shared by and to the user can be viewed
   const dispatch = useDispatch();
-  
+
   const libraryRef = useRef<Library | null>(null);
   if (libraryRef.current === null) {
-    libraryRef.current = new Library(); 
+    libraryRef.current = new Library();
     libraryRef.current.populateChildrenArr();
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(centerNavbarTitle(LibraryNavbarObj));
-  }, [])
+  }, []);
 
   const library = libraryRef.current;
 
   const isCollapsed = useSelector(
     (state: RootState) => state.navbar.isCollapsed,
   );
-  
+
   return (
     <div
       className={`w-full h-full pb-2 px-2 duration-100 transform-all ease-linear ${isCollapsed ? "pt-3" : "pt-7"} `}
     >
-      {/* <div className="w-full h-7 px-2"> <DirectoryNavigator library={library} /> </div> */}
+      <div className="w-full h-7 px-2">
+        {" "}
+        <DirectoryNavigator libraryRef={libraryRef} />{" "}
+      </div>
       <div className="w-full h-full rounded-3xl relative bg-blue-ogg-1 p-5 ">
         <div className="w-full max-h-full  overflow-y-auto overflow-x-hidden ">
-          <Shelf libraryRef={libraryRef} />  {/*//TODO PASS LIBRARY REF */}
+          <Shelf libraryRef={libraryRef} /> {/*//TODO PASS LIBRARY REF */}
           {/* library data inserted here to keep the + sign floating fixed */}
         </div>
 

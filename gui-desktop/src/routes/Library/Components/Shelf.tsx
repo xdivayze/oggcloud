@@ -31,9 +31,6 @@ export function Shelf({
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    dispatch(setEffectivePath(path));
-  }, [dispatch, path]);
 
   useEffect(() => {
     const library = libraryRef.current;
@@ -63,7 +60,8 @@ export function Shelf({
       await Promise.all(children.map((v) => v.instantiateSelfFromID()));
       //TODO add go to parent directory
       setShelfItems([...children.filter((v) => v.getID() != path)]);
-
+      dispatch(setEffectivePath(path));
+      
       setFetching(false);
     }
 
