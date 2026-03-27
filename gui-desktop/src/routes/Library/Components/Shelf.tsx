@@ -6,7 +6,7 @@ import LibraryObject from "./LibraryObject";
 import type { Library } from "../models/library";
 import { Folder } from "../models/folder";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { setEffectivePath } from "../librarySlice";
+import { setEffectivePath, setEffectivePathTree } from "../librarySlice";
 import { LibraryNavbarObj } from "../Library";
 import { fetchFamilyTree } from "../services/fetchFamilyTree";
 
@@ -30,7 +30,6 @@ export function Shelf({
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
 
   useEffect(() => {
     const library = libraryRef.current;
@@ -61,7 +60,8 @@ export function Shelf({
       //TODO add go to parent directory
       setShelfItems([...children.filter((v) => v.getID() != path)]);
       dispatch(setEffectivePath(path));
-      
+      dispatch(setEffectivePathTree(tree));
+
       setFetching(false);
     }
 
